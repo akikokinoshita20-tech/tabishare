@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="TabiShare">
 <meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.json">
 <title>TabiShare</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -63,7 +64,6 @@ h1.page-title{font-size:20px;font-weight:700;margin-bottom:4px;}
 .offline-banner{display:none;background:#FAEEDA;padding:8px 16px;font-size:12px;color:#854F0B;text-align:center;}
 .offline-banner.show{display:block;}
 .link-btn{color:#3B82F6;font-size:12px;text-decoration:none;word-break:break-all;}
-select.input{appearance:none;}
 </style>
 </head>
 <body>
@@ -103,9 +103,7 @@ select.input{appearance:none;}
   <div class="modal-box">
     <div class="modal-header"><strong>新しい旅行を追加</strong><button onclick="hideModal('newTripModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
     <label class="tiny">旅行名</label><input class="input" id="nt-name" placeholder="例：バリ島旅行">
-    <label class="tiny">カバー絵文字</label>
-    <div class="chip-row" id="coverPicker"></div>
-    <input type="hidden" id="nt-cover" value="🗼">
+    <label class="tiny">カバー絵文字</label><div class="chip-row" id="coverPicker"></div><input type="hidden" id="nt-cover" value="🗼">
     <label class="tiny">出発日</label><input class="input" id="nt-start" type="date">
     <label class="tiny">帰宅日</label><input class="input" id="nt-end" type="date">
     <div style="display:flex;gap:8px;margin-top:8px;">
@@ -119,9 +117,7 @@ select.input{appearance:none;}
   <div class="modal-box">
     <div class="modal-header"><strong>旅行を編集</strong><button onclick="hideModal('editTripModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
     <label class="tiny">旅行名</label><input class="input" id="et-name">
-    <label class="tiny">カバー絵文字</label>
-    <div class="chip-row" id="editCoverPicker"></div>
-    <input type="hidden" id="et-cover" value="🗼">
+    <label class="tiny">カバー絵文字</label><div class="chip-row" id="editCoverPicker"></div><input type="hidden" id="et-cover" value="🗼">
     <label class="tiny">出発日</label><input class="input" id="et-start" type="date">
     <label class="tiny">帰宅日</label><input class="input" id="et-end" type="date">
     <div style="display:flex;gap:8px;margin-top:8px;">
@@ -144,9 +140,7 @@ select.input{appearance:none;}
     <label class="tiny">クラス</label><input class="input" id="ef-cls" placeholder="例：エコノミー">
     <label class="tiny">確認番号</label><input class="input" id="ef-confirmNo" placeholder="例：ABC123">
     <label class="tiny">フリーメモ</label><textarea class="input" id="ef-note" placeholder="メモ・備考など"></textarea>
-    <label class="tiny">追加者</label>
-    <div class="chip-row" id="ef-member-chips"></div>
-    <input type="hidden" id="ef-addedBy" value="ケンケン">
+    <label class="tiny">追加者</label><div class="chip-row" id="ef-member-chips"></div><input type="hidden" id="ef-addedBy" value="ケンケン">
     <div style="display:flex;gap:8px;margin-top:8px;">
       <button class="btn-sec" style="flex:1" onclick="hideModal('editFlightModal')">キャンセル</button>
       <button class="btn-primary" style="flex:1" onclick="saveFlight()">保存</button>
@@ -166,9 +160,7 @@ select.input{appearance:none;}
     <label class="tiny">Google Map URL</label><input class="input" id="eh-mapUrl" placeholder="https://maps.google.com/...">
     <label class="tiny">備考・キャンセル料など</label><textarea class="input" id="eh-note" placeholder="例：キャンセル料期限など"></textarea>
     <label class="tiny">フリーメモ</label><textarea class="input" id="eh-free" placeholder="自由にメモを入力"></textarea>
-    <label class="tiny">追加者</label>
-    <div class="chip-row" id="eh-member-chips"></div>
-    <input type="hidden" id="eh-addedBy" value="ケンケン">
+    <label class="tiny">追加者</label><div class="chip-row" id="eh-member-chips"></div><input type="hidden" id="eh-addedBy" value="ケンケン">
     <div style="display:flex;gap:8px;margin-top:8px;">
       <button class="btn-sec" style="flex:1" onclick="hideModal('editHotelModal')">キャンセル</button>
       <button class="btn-primary" style="flex:1" onclick="saveHotel()">保存</button>
@@ -181,17 +173,13 @@ select.input{appearance:none;}
     <div class="modal-header"><strong id="insModalTitle">保険を追加</strong><button onclick="hideModal('editInsuranceModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
     <input type="hidden" id="ei-id">
     <label class="tiny">保険名</label><input class="input" id="ei-name" placeholder="例：楽天トラベル保険">
-    <label class="tiny">保険の種類</label>
-    <div class="chip-row" id="ei-type-chips"></div>
-    <input type="hidden" id="ei-type" value="海外旅行保険">
-    <label class="tiny">支払者</label>
-    <div class="chip-row" id="ei-member-chips"></div>
-    <input type="hidden" id="ei-paidBy" value="ケンケン">
-    <label class="tiny">保険料金</label><input class="input" id="ei-amount" placeholder="例：¥12,400" type="number">
+    <label class="tiny">保険の種類</label><div class="chip-row" id="ei-type-chips"></div><input type="hidden" id="ei-type" value="海外旅行保険">
+    <label class="tiny">支払者</label><div class="chip-row" id="ei-member-chips"></div><input type="hidden" id="ei-paidBy" value="ケンケン">
+    <label class="tiny">保険料金（円）</label><input class="input" id="ei-amount" placeholder="例：12400" type="number">
     <label class="tiny">支払日</label><input class="input" id="ei-date" type="date">
     <label class="tiny">証券番号</label><input class="input" id="ei-no" placeholder="例：RTI-20250715-001">
     <label class="tiny">補償内容・メモ</label><textarea class="input" id="ei-note" placeholder="補償内容や連絡先など自由に"></textarea>
-    <label class="tiny">PDFファイル名（添付メモ）</label><input class="input" id="ei-pdf" placeholder="例：楽天保険証書.pdf（ファイル名のみ記録）">
+    <label class="tiny">PDFファイル名（添付メモ）</label><input class="input" id="ei-pdf" placeholder="例：楽天保険証書.pdf">
     <div style="display:flex;gap:8px;margin-top:8px;">
       <button class="btn-sec" style="flex:1" onclick="hideModal('editInsuranceModal')">キャンセル</button>
       <button class="btn-primary" style="flex:1" onclick="saveInsurance()">保存</button>
@@ -204,15 +192,9 @@ select.input{appearance:none;}
     <div class="modal-header"><strong id="placeModalTitle">場所を追加</strong><button onclick="hideModal('addPlaceModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
     <input type="hidden" id="ap-id">
     <input class="input" id="ap-name" placeholder="場所の名前">
-    <label class="tiny">カテゴリ</label>
-    <div class="chip-row" id="ap-cat-chips"></div>
-    <input type="hidden" id="ap-cat" value="観光">
-    <label class="tiny">優先度</label>
-    <div class="chip-row" id="ap-prio-chips"></div>
-    <input type="hidden" id="ap-prio" value="絶対行く">
-    <label class="tiny">追加者</label>
-    <div class="chip-row" id="ap-member-chips"></div>
-    <input type="hidden" id="ap-addedBy" value="ケンケン">
+    <label class="tiny">カテゴリ</label><div class="chip-row" id="ap-cat-chips"></div><input type="hidden" id="ap-cat" value="観光">
+    <label class="tiny">優先度</label><div class="chip-row" id="ap-prio-chips"></div><input type="hidden" id="ap-prio" value="絶対行く">
+    <label class="tiny">追加者</label><div class="chip-row" id="ap-member-chips"></div><input type="hidden" id="ap-addedBy" value="ケンケン">
     <label class="tiny">フリーコメント</label><textarea class="input" id="ap-memo" placeholder="メモ・感想など自由に"></textarea>
     <label class="tiny">Google Map URL</label><input class="input" id="ap-mapUrl" placeholder="https://maps.google.com/...">
     <label class="tiny">参考URL</label><input class="input" id="ap-infoUrl" placeholder="https://...">
@@ -230,22 +212,64 @@ select.input{appearance:none;}
   </div>
 </div>
 
+<div class="modal-overlay" id="editExpModal">
+  <div class="modal-box">
+    <div class="modal-header"><strong id="editExpTitle">支出を編集</strong><button onclick="hideModal('editExpModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
+    <input type="hidden" id="ee-id">
+    <input type="hidden" id="ee-cat">
+    <input class="input" id="ee-desc" placeholder="内容（例：ディナー）">
+    <label class="tiny">金額（円）</label><input class="input" id="ee-amount" type="number" placeholder="例：5000">
+    <label class="tiny">支払者</label><div class="chip-row" id="ee-member-chips"></div><input type="hidden" id="ee-paidBy" value="ケンケン">
+    <input class="input" id="ee-date" type="date">
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn-sec" style="flex:1" onclick="hideModal('editExpModal')">キャンセル</button>
+      <button class="btn-primary" style="flex:1" onclick="updateExpense()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addExpModal">
+  <div class="modal-box">
+    <div class="modal-header"><strong id="addExpTitle">支出を追加</strong><button onclick="hideModal('addExpModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
+    <input type="hidden" id="ae-cat">
+    <input class="input" id="ae-desc" placeholder="内容（例：ディナー）">
+    <label class="tiny">金額（円）</label><input class="input" id="ae-amount" type="number" placeholder="例：5000">
+    <label class="tiny">支払者</label><div class="chip-row" id="ae-member-chips"></div><input type="hidden" id="ae-paidBy" value="ケンケン">
+    <input class="input" id="ae-date" type="date">
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn-sec" style="flex:1" onclick="hideModal('addExpModal')">キャンセル</button>
+      <button class="btn-primary" style="flex:1" onclick="saveExpense()">追加</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settlementModal">
+  <div class="modal-box">
+    <div class="modal-header"><strong>精算を記録</strong><button onclick="hideModal('settlementModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
+    <input type="hidden" id="sl-id">
+    <label class="tiny">精算日</label><input class="input" id="sl-date" type="date">
+    <label class="tiny">精算金額（円）</label><input class="input" id="sl-amount" type="number" placeholder="例：15000">
+    <label class="tiny">支払者</label><div class="chip-row" id="sl-from-chips"></div><input type="hidden" id="sl-from" value="ケンケン">
+    <label class="tiny">受取者</label><div class="chip-row" id="sl-to-chips"></div><input type="hidden" id="sl-to" value="あき">
+    <label class="tiny">備考</label><textarea class="input" id="sl-note" placeholder="例：現金で精算、LINE Pay送金 など"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn-sec" style="flex:1" onclick="hideModal('settlementModal')">キャンセル</button>
+      <button class="btn-primary" style="flex:1" onclick="saveSettlement()">保存</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="editScheduleModal">
   <div class="modal-box">
     <div class="modal-header"><strong id="scheduleModalTitle">予定を追加</strong><button onclick="hideModal('editScheduleModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
     <input type="hidden" id="as-id">
-    <label class="tiny">日程</label>
-    <select class="input" id="as-day"></select>
+    <label class="tiny">日程</label><select class="input" id="as-day"></select>
     <label class="tiny">開始時刻（任意）</label><input class="input" id="as-time" placeholder="例：09:00">
     <label class="tiny">終了時刻（任意）</label><input class="input" id="as-endtime" placeholder="例：11:00">
-    <label class="tiny">カテゴリ</label>
-    <div class="chip-row" id="as-cat-chips"></div>
-    <input type="hidden" id="as-cat" value="観光">
+    <label class="tiny">カテゴリ</label><div class="chip-row" id="as-cat-chips"></div><input type="hidden" id="as-cat" value="観光">
     <input class="input" id="as-title" placeholder="タイトル">
     <textarea class="input" id="as-memo" placeholder="メモ（任意）"></textarea>
-    <label class="tiny">メンバー</label>
-    <div class="chip-row" id="as-member-chips"></div>
-    <input type="hidden" id="as-member" value="両方">
+    <label class="tiny">メンバー</label><div class="chip-row" id="as-member-chips"></div><input type="hidden" id="as-member" value="両方">
     <div style="display:flex;gap:8px;margin-top:8px;">
       <button class="btn-sec" style="flex:1" onclick="hideModal('editScheduleModal')">キャンセル</button>
       <button class="btn-primary" style="flex:1" onclick="saveSchedule()">保存</button>
@@ -258,17 +282,13 @@ select.input{appearance:none;}
     <div class="modal-header"><strong id="checkModalTitle">持ち物を追加</strong><button onclick="hideModal('editCheckModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
     <input type="hidden" id="ack-id">
     <input class="input" id="ack-name" placeholder="例：パスポート">
-    <label class="tiny">カテゴリ</label>
-    <div class="chip-row" id="ack-cat-chips"></div>
-    <input type="hidden" id="ack-cat" value="書類">
+    <label class="tiny">カテゴリ</label><div class="chip-row" id="ack-cat-chips"></div><input type="hidden" id="ack-cat" value="書類">
     <label class="tiny">新しいカテゴリを追加</label>
     <div style="display:flex;gap:8px;margin-bottom:10px;">
       <input class="input" style="flex:1;margin-bottom:0" id="ack-new-cat" placeholder="例：スポーツ用品">
       <button class="btn-primary" onclick="addCustomCheckCat()">追加</button>
     </div>
-    <label class="tiny">担当者</label>
-    <div class="chip-row" id="ack-member-chips"></div>
-    <input type="hidden" id="ack-member" value="両方">
+    <label class="tiny">担当者</label><div class="chip-row" id="ack-member-chips"></div><input type="hidden" id="ack-member" value="両方">
     <div style="display:flex;gap:8px;margin-top:8px;">
       <button class="btn-sec" style="flex:1" onclick="hideModal('editCheckModal')">キャンセル</button>
       <button class="btn-primary" style="flex:1" onclick="saveCheckItem()">保存</button>
@@ -276,26 +296,9 @@ select.input{appearance:none;}
   </div>
 </div>
 
-<div class="modal-overlay" id="addExpModal">
-  <div class="modal-box">
-    <div class="modal-header"><strong id="addExpTitle">支出を追加</strong><button onclick="hideModal('addExpModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
-    <input type="hidden" id="ae-cat">
-    <input class="input" id="ae-desc" placeholder="内容（例：ディナー）">
-    <label class="tiny">金額（円）</label><input class="input" id="ae-amount" type="number" placeholder="例：5000">
-    <label class="tiny">支払者</label>
-    <div class="chip-row" id="ae-member-chips"></div>
-    <input type="hidden" id="ae-paidBy" value="ケンケン">
-    <input class="input" id="ae-date" type="date">
-    <div style="display:flex;gap:8px;margin-top:8px;">
-      <button class="btn-sec" style="flex:1" onclick="hideModal('addExpModal')">キャンセル</button>
-      <button class="btn-primary" style="flex:1" onclick="saveExpense()">追加</button>
-    </div>
-  </div>
-</div>
-
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const firebaseConfig = {
@@ -310,42 +313,49 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
+// オフライン永続化（Firebaseネイティブ対応）
+enableIndexedDbPersistence(db).catch(()=>{});
 signInAnonymously(auth).catch(console.error);
 
 // ── constants ──
-const COVERS = ['🗼','🏝️','🏔️','🌸','🎌','🌍','🗽','🏰','🌺','🎭'];
-const MEMBERS = ['ケンケン','あき'];
-const CATS = ['交通','食事','観光','ホテル','ショッピング','その他'];
-const CAT_ICON = {'交通':'🚆','食事':'🍽️','観光':'🏛️','ホテル':'🏨','ショッピング':'🛍️','その他':'📌'};
-const CAT_BG = {'交通':'#EEEDFE','食事':'#E1F5EE','観光':'#E6F1FB','ホテル':'#FAEEDA','ショッピング':'#FAECE7','その他':'#F1EFE8'};
-const CAT_COLOR = {'交通':'#3C3489','食事':'#085041','観光':'#0C447C','ホテル':'#854F0B','ショッピング':'#993C1D','その他':'#5F5E5A'};
-const MEMBER_BG = {'ケンケン':'#EEEDFE','あき':'#FAECE7','両方':'#E1F5EE'};
-const MEMBER_COLOR = {'ケンケン':'#3C3489','あき':'#993C1D','両方':'#085041'};
-const CHECK_CATS = ['書類','衣類','電子機器','衛生用品','薬','その他'];
-const CHECK_CAT_ICON = {'書類':'📄','衣類':'👕','電子機器':'📱','衛生用品':'🧴','薬':'💊','その他':'🎒'};
-const INS_TYPES = ['海外旅行保険','キャンセル保険','航空保険','その他'];
+const COVERS=['🗼','🏝️','🏔️','🌸','🎌','🌍','🗽','🏰','🌺','🎭'];
+const MEMBERS=['ケンケン','あき'];
+const CATS=['交通','食事','観光','ホテル','ショッピング','その他'];
+const CAT_ICON={'交通':'🚆','食事':'🍽️','観光':'🏛️','ホテル':'🏨','ショッピング':'🛍️','その他':'📌'};
+const CAT_BG={'交通':'#EEEDFE','食事':'#E1F5EE','観光':'#E6F1FB','ホテル':'#FAEEDA','ショッピング':'#FAECE7','その他':'#F1EFE8'};
+const CAT_COLOR={'交通':'#3C3489','食事':'#085041','観光':'#0C447C','ホテル':'#854F0B','ショッピング':'#993C1D','その他':'#5F5E5A'};
+const MEMBER_BG={'ケンケン':'#EEEDFE','あき':'#FAECE7','両方':'#E1F5EE'};
+const MEMBER_COLOR={'ケンケン':'#3C3489','あき':'#993C1D','両方':'#085041'};
+const CHECK_CATS=['書類','衣類','電子機器','衛生用品','薬','その他'];
+const CHECK_CAT_ICON={'書類':'📄','衣類':'👕','電子機器':'📱','衛生用品':'🧴','薬':'💊','その他':'🎒'};
+const INS_TYPES=['海外旅行保険','キャンセル保険','航空保険','その他'];
 
 // ── state ──
-window.trips = [];
-window.activeTrip = null;
-window.activeTab = 'home';
-window.activeDay = 0;
-window.placesFilter = 'すべて';
-window.checkFilter = 'すべて';
-window.isOnline = navigator.onLine;
-window.offlineQueue = JSON.parse(localStorage.getItem('offlineQueue')||'[]');
+window.trips=[];
+window.activeTrip=null;
+window.activeTab='home';
+window.activeDay=0;
+window.placesFilter='すべて';
+window.checkFilter='すべて';
+window.isOnline=navigator.onLine;
+window.currentBudgetCat=null;
 
-window.addEventListener('online',()=>{window.isOnline=true;document.getElementById('offlineBanner').classList.remove('show');flushQueue();});
-window.addEventListener('offline',()=>{window.isOnline=false;document.getElementById('offlineBanner').classList.add('show');});
+window.addEventListener('online',()=>{
+  window.isOnline=true;
+  document.getElementById('offlineBanner').classList.remove('show');
+});
+window.addEventListener('offline',()=>{
+  window.isOnline=false;
+  document.getElementById('offlineBanner').classList.add('show');
+});
 if(!navigator.onLine) document.getElementById('offlineBanner').classList.add('show');
 
-async function flushQueue(){
-  const q=[...window.offlineQueue];window.offlineQueue=[];localStorage.removeItem('offlineQueue');
-  for(const item of q){try{await setDoc(doc(db,'trips',item.id),item);}catch(e){}}
-}
-
+// Firebase の onSnapshot はオフライン時もキャッシュから読む
 onSnapshot(collection(db,'trips'),snapshot=>{
-  if(!snapshot.empty){window.trips=snapshot.docs.map(d=>({...d.data(),id:d.id}));}
+  if(!snapshot.empty){
+    window.trips=snapshot.docs.map(d=>({...d.data(),id:d.id}));
+  }
   renderTripList();
   if(window.activeTrip){
     const updated=window.trips.find(t=>t.id===window.activeTrip.id);
@@ -354,18 +364,13 @@ onSnapshot(collection(db,'trips'),snapshot=>{
 });
 
 async function saveTrip(trip){
-  if(window.isOnline){try{await setDoc(doc(db,'trips',trip.id),trip);}catch(e){queueSave(trip);}}
-  else{queueSave(trip);}
+  try{await setDoc(doc(db,'trips',trip.id),trip);}
+  catch(e){console.warn('保存失敗（オフライン時はキャッシュ保存）',e);}
 }
 async function removeTrip(id){
   window.trips=window.trips.filter(t=>t.id!==id);
   renderTripList();
-  if(window.isOnline){try{await deleteDoc(doc(db,'trips',id));}catch(e){}}
-}
-function queueSave(trip){
-  window.offlineQueue=window.offlineQueue.filter(q=>q.id!==trip.id);
-  window.offlineQueue.push(trip);
-  localStorage.setItem('offlineQueue',JSON.stringify(window.offlineQueue));
+  try{await deleteDoc(doc(db,'trips',id));}catch(e){}
 }
 function updateTrip(data){
   const updated={...window.activeTrip,...data};
@@ -384,13 +389,13 @@ function tripStatus(t){
   if(e>=0)return{label:'旅行中！',bg:'#E1F5EE',color:'#085041'};
   return{label:'終了',bg:'#F1EFE8',color:'#5F5E5A'};
 }
-function totalNights(t){return (t.hotels||[]).reduce((a,h)=>a+(parseInt(h.nights)||0),0);}
+function totalNights(t){return(t.hotels||[]).reduce((a,h)=>a+(parseInt(h.nights)||0),0);}
 function avatar(name,size=24){
   return `<div class="avatar" style="width:${size}px;height:${size}px;background:${MEMBER_BG[name]||'#F1EFE8'};color:${MEMBER_COLOR[name]||'#5F5E5A'};font-size:${size*0.38}px">${name==='両方'?'両':name[0]}</div>`;
 }
 function badge(label,bg,color){return `<span class="badge" style="background:${bg};color:${color}">${label}</span>`;}
 function progBar(pct){const c=pct>100?'#E24B4A':pct>80?'#EF9F27':'#1D9E75';return `<div class="prog-bar"><div class="prog-fill" style="width:${Math.min(pct,100)}%;background:${c}"></div></div>`;}
-function getCheckCats(){return [...CHECK_CATS,...(window.activeTrip?.customCheckCats||[]).filter(c=>!CHECK_CATS.includes(c))];}
+function getCheckCats(){return[...CHECK_CATS,...(window.activeTrip?.customCheckCats||[]).filter(c=>!CHECK_CATS.includes(c))];}
 function getCheckCatIcon(cat){return CHECK_CAT_ICON[cat]||'📦';}
 function escJ(obj){return JSON.stringify(obj).replace(/'/g,"&#39;").replace(/"/g,'&quot;');}
 
@@ -405,13 +410,15 @@ window.hideModal=function(id){document.getElementById(id).classList.remove('acti
 // ── TRIP LIST ──
 function renderTripList(){
   const cp=document.getElementById('coverPicker');
-  if(cp) cp.innerHTML=COVERS.map(c=>`<button class="chip${c==='🗼'?' active':''}" onclick="selectChip('nt-cover','${c}',this)">${c}</button>`).join('');
+  if(cp)cp.innerHTML=COVERS.map(c=>`<button class="chip${c==='🗼'?' active':''}" onclick="selectChip('nt-cover','${c}',this)">${c}</button>`).join('');
   const cont=document.getElementById('tripListContainer');
   if(!window.trips.length){
     cont.innerHTML=`<div style="text-align:center;padding:60px 0"><div style="font-size:40px;margin-bottom:12px">🌍</div><p class="sub" style="margin-bottom:16px">旅行がまだありません</p><button class="btn-primary" onclick="showModal('newTripModal')">＋ 最初の旅行を追加</button></div>`;
     return;
   }
-  cont.innerHTML=window.trips.map(t=>{
+  // 出発日順に並び替え
+  const sorted=[...window.trips].sort((a,b)=>(a.startDate||'').localeCompare(b.startDate||''));
+  cont.innerHTML=sorted.map(t=>{
     const st=tripStatus(t);
     const totalB=(t.budgets||[]).reduce((a,b)=>a+(b.budgetJPY||0),0);
     const totalS=(t.expenses||[]).reduce((a,e)=>a+(e.amountJPY||0),0);
@@ -464,7 +471,7 @@ window.createTrip=function(){
   if(!name||!start||!end){alert('旅行名・出発日・帰宅日を入力してください');return;}
   const days=[];const d=new Date(start),ed=new Date(end);const DOW=['日','月','火','水','木','金','土'];
   while(d<=ed){days.push({date:(d.getMonth()+1)+'/'+(d.getDate())+'('+DOW[d.getDay()]+')',label:''});d.setDate(d.getDate()+1);}
-  const trip={id:'trip'+Date.now(),name,cover,startDate:start,endDate:end,members:['ケンケン','あき'],flights:[],hotels:[],insurance:[],places:[],expenses:[],budgets:CATS.map(cat=>({cat,budgetJPY:0,note:''})),schedule:[],checklist:[],customCheckCats:[],days};
+  const trip={id:'trip'+Date.now(),name,cover,startDate:start,endDate:end,members:['ケンケン','あき'],flights:[],hotels:[],insurance:[],places:[],expenses:[],settlements:[],budgets:CATS.map(cat=>({cat,budgetJPY:0,note:''})),schedule:[],checklist:[],customCheckCats:[],days};
   saveTrip(trip);window.trips.push(trip);renderTripList();hideModal('newTripModal');
   ['nt-name','nt-start','nt-end'].forEach(id=>document.getElementById(id).value='');
 };
@@ -662,10 +669,7 @@ function renderInsurance(t){
     ${ins.length?ins.map(i=>`
       <div class="card">
         <div class="row">
-          <div>
-            <strong style="font-size:15px">${i.name}</strong>
-            <div style="margin-top:4px">${badge(i.type||'','#E1F5EE','#085041')}</div>
-          </div>
+          <div><strong style="font-size:15px">${i.name}</strong><div style="margin-top:4px">${badge(i.type||'','#E1F5EE','#085041')}</div></div>
           <div style="display:flex;gap:6px">
             <button class="btn-edit" onclick='editInsurance(${escJ(i)})'>編集</button>
             <button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteInsurance(${i.id})">削除</button>
@@ -681,7 +685,6 @@ function renderInsurance(t){
         ${i.pdf?`<div class="note-box">📎 添付ファイル: ${i.pdf}</div>`:''}
       </div>`).join(''):'<div class="empty">保険情報がまだありません</div>'}`;
 }
-
 window.openInsModal=function(){
   document.getElementById('insModalTitle').textContent='保険を追加';
   document.getElementById('ei-id').value='';
@@ -787,7 +790,10 @@ window.deletePlace=function(id){updateTrip({places:(window.activeTrip.places||[]
 function renderBudget(t){
   const totalB=(t.budgets||[]).reduce((a,b)=>a+(b.budgetJPY||0),0);
   const totalS=(t.expenses||[]).reduce((a,e)=>a+(e.amountJPY||0),0);
+  const settled=(t.settlements||[]).reduce((a,s)=>a+(parseInt(s.amount)||0),0);
   const memberData=(t.members||[]).map(m=>({name:m,total:(t.expenses||[]).filter(e=>e.paidBy===m).reduce((a,e)=>a+e.amountJPY,0)}));
+  const diff=memberData.length>=2?Math.abs(memberData[0].total-memberData[1].total)/2:0;
+  const remaining=diff-settled;
   return `
     <h1 class="page-title">予算・支出管理</h1>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0">
@@ -811,15 +817,68 @@ function renderBudget(t){
         ${b.note?`<div class="note-box">📋 ${b.note}</div>`:''}
       </div>`;
     }).join('')}
+
     <div class="section-title" style="margin:16px 0 10px">メンバー別</div>
     ${memberData.map(({name,total})=>`
       <div class="card" style="margin-bottom:10px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">${avatar(name,34)}<div><strong style="font-size:15px">${name}</strong><div class="tiny">合計: <strong>${fmt(total)}</strong></div></div></div>
         ${CATS.map(cat=>{const items=(t.expenses||[]).filter(e=>e.paidBy===name&&e.cat===cat);if(!items.length)return'';const sub=items.reduce((a,e)=>a+e.amountJPY,0);return`<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span class="tiny">${CAT_ICON[cat]} ${cat}</span><span class="tiny">${fmt(sub)}</span></div>`;}).join('')}
       </div>`).join('')}
-    ${(()=>{if(memberData.length<2)return'';const[a,b]=memberData;const diff=Math.abs(a.total-b.total)/2;const payer=a.total>b.total?b.name:a.name;const recv=a.total>b.total?a.name:b.name;return diff>0?`<div class="card" style="background:#F9FAFB"><div class="tiny">精算</div><div style="font-size:14px;margin-top:4px"><strong>${payer}</strong> → <strong>${recv}</strong> に <strong>${fmt(diff)}</strong></div></div>`:'';})()}`;
+
+    ${memberData.length>=2&&diff>0?`
+    <div class="card" style="background:#F0FDF4;border-color:#BBF7D0;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+          <div class="tiny">精算</div>
+          <div style="font-size:14px;margin-top:2px"><strong>${memberData[0].total>memberData[1].total?memberData[1].name:memberData[0].name}</strong> → <strong>${memberData[0].total>memberData[1].total?memberData[0].name:memberData[1].name}</strong> に <strong>${fmt(diff)}</strong></div>
+          ${settled>0?`<div class="tiny" style="margin-top:4px">精算済み: ${fmt(settled)} ／ 残り: <strong style="color:${remaining>0?'#EF4444':'#1D9E75'}">${fmt(Math.max(remaining,0))}</strong></div>`:''}
+        </div>
+        <button class="btn-primary" onclick="openSettlementModal()">記録</button>
+      </div>
+    </div>`:''}
+
+    ${(t.settlements||[]).length?`
+    <div class="section-title" style="margin:8px 0">精算履歴</div>
+    ${[...(t.settlements||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(s=>`
+      <div class="card" style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-size:14px;font-weight:600">${fmt(parseInt(s.amount)||0)}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+              ${avatar(s.from,16)}<span class="tiny">${s.from}</span>
+              <span class="tiny">→</span>
+              ${avatar(s.to,16)}<span class="tiny">${s.to}</span>
+              ${s.date?`<span class="tiny">${s.date}</span>`:''}
+            </div>
+            ${s.note?`<div class="note-box" style="margin-top:6px">📝 ${s.note}</div>`:''}
+          </div>
+          <button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteSettlement(${s.id})">削除</button>
+        </div>
+      </div>`).join('')}`:''}`;
 }
+
+window.openSettlementModal=function(){
+  document.getElementById('sl-id').value='';
+  document.getElementById('sl-date').value='';
+  document.getElementById('sl-amount').value='';
+  document.getElementById('sl-note').value='';
+  document.getElementById('sl-from').value='ケンケン';
+  document.getElementById('sl-to').value='あき';
+  document.getElementById('sl-from-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m==='ケンケン'?' active':''}" onclick="selectChip('sl-from','${m}',this)">${m}</button>`).join('');
+  document.getElementById('sl-to-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m==='あき'?' active':''}" onclick="selectChip('sl-to','${m}',this)">${m}</button>`).join('');
+  showModal('settlementModal');
+};
+window.saveSettlement=function(){
+  const amount=document.getElementById('sl-amount').value;
+  if(!amount){alert('金額を入力してください');return;}
+  const s={id:Date.now(),date:document.getElementById('sl-date').value,amount:parseInt(amount)||0,from:document.getElementById('sl-from').value,to:document.getElementById('sl-to').value,note:document.getElementById('sl-note').value};
+  updateTrip({settlements:[...(window.activeTrip.settlements||[]),s]});
+  hideModal('settlementModal');
+};
+window.deleteSettlement=function(id){if(!confirm('削除しますか？'))return;updateTrip({settlements:(window.activeTrip.settlements||[]).filter(s=>s.id!==id)});};
+
 window.openBudgetDetail=function(cat){
+  window.currentBudgetCat=cat;
   const t=window.activeTrip;
   const b=(t.budgets||[]).find(b=>b.cat===cat)||{};
   const catExps=(t.expenses||[]).filter(e=>e.cat===cat);
@@ -844,7 +903,10 @@ window.openBudgetDetail=function(cat){
     ${catExps.length?catExps.map(e=>`<div class="card" style="margin-bottom:8px">
       <div style="display:flex;justify-content:space-between">
         <div><strong>${e.desc}</strong><div style="display:flex;align-items:center;gap:8px;margin-top:4px"><strong>${fmt(e.amountJPY)}</strong>${avatar(e.paidBy,16)}<span class="tiny">${e.paidBy}</span>${e.date?`<span class="tiny">${e.date}</span>`:''}</div></div>
-        <button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteExp(${e.id},'${cat}')">削除</button>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <button class="btn-edit" style="font-size:10px;padding:2px 7px" onclick='openEditExpModal(${escJ(e)})'>編集</button>
+          <button class="btn-danger" style="font-size:10px;padding:2px 7px" onclick="deleteExp(${e.id},'${cat}')">削除</button>
+        </div>
       </div></div>`).join(''):'<div class="empty">支出がまだありません</div>'}`;
   showModal('budgetDetailModal');
 };
@@ -855,8 +917,8 @@ window.saveBudgetDetail=function(cat){
   openBudgetDetail(cat);
 };
 window.openExpModal=function(cat){
-  document.getElementById('ae-cat').value=cat;
   ['ae-desc','ae-amount','ae-date'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ae-cat').value=cat;
   document.getElementById('ae-paidBy').value='ケンケン';
   document.getElementById('ae-member-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m==='ケンケン'?' active':''}" onclick="selectChip('ae-paidBy','${m}',this)">${m}</button>`).join('');
   document.getElementById('addExpTitle').textContent=CAT_ICON[cat]+' '+cat+' — 支出を追加';
@@ -869,6 +931,25 @@ window.saveExpense=function(){
   updateTrip({expenses:[...(window.activeTrip.expenses||[]),e]});
   hideModal('addExpModal');openBudgetDetail(cat);
 };
+window.openEditExpModal=function(e){
+  document.getElementById('ee-id').value=e.id;
+  document.getElementById('ee-cat').value=e.cat;
+  document.getElementById('ee-desc').value=e.desc||'';
+  document.getElementById('ee-amount').value=e.amountJPY||'';
+  document.getElementById('ee-date').value=e.date||'';
+  document.getElementById('ee-paidBy').value=e.paidBy||'ケンケン';
+  document.getElementById('editExpTitle').textContent=CAT_ICON[e.cat]+' '+e.cat+' — 支出を編集';
+  document.getElementById('ee-member-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m===(e.paidBy||'ケンケン')?' active':''}" onclick="selectChip('ee-paidBy','${m}',this)">${m}</button>`).join('');
+  showModal('editExpModal');
+};
+window.updateExpense=function(){
+  const id=parseInt(document.getElementById('ee-id').value);
+  const cat=document.getElementById('ee-cat').value;
+  const desc=document.getElementById('ee-desc').value.trim();if(!desc)return;
+  const updated={id,cat,desc,amountJPY:parseFloat(document.getElementById('ee-amount').value)||0,paidBy:document.getElementById('ee-paidBy').value,date:document.getElementById('ee-date').value};
+  updateTrip({expenses:(window.activeTrip.expenses||[]).map(e=>e.id===id?updated:e)});
+  hideModal('editExpModal');openBudgetDetail(cat);
+};
 window.deleteExp=function(id,cat){
   updateTrip({expenses:(window.activeTrip.expenses||[]).filter(e=>e.id!==id)});
   openBudgetDetail(cat);
@@ -878,7 +959,10 @@ window.deleteExp=function(id,cat){
 function renderSchedule(t){
   const days=t.days||[];
   const day=days[window.activeDay]||{};
-  const events=(t.schedule||[]).filter(e=>e.day===window.activeDay).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+  // 開始時刻順にソート（時刻なしは末尾）
+  const events=(t.schedule||[])
+    .filter(e=>e.day===window.activeDay)
+    .sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
   return `
     <h1 class="page-title">スケジュール</h1>
     <div class="chip-row" style="margin:12px 0">
@@ -894,11 +978,11 @@ function renderSchedule(t){
     </div>
     ${events.length?`<div style="padding-left:4px">${events.map(ev=>`
       <div style="display:flex;gap:10px;margin-bottom:12px;align-items:flex-start">
-        <div style="width:50px;text-align:right;padding-top:4px">
+        <div style="width:50px;text-align:right;padding-top:4px;flex-shrink:0">
           <div class="tiny">${ev.time||'－'}</div>
           ${ev.endtime?`<div class="tiny" style="color:#9CA3AF">〜${ev.endtime}</div>`:''}
         </div>
-        <div style="width:2px;background:#E5E7EB;border-radius:99px;align-self:stretch"></div>
+        <div style="width:2px;background:#E5E7EB;border-radius:99px;align-self:stretch;flex-shrink:0"></div>
         <div class="card" style="flex:1;padding:10px 12px">
           <div style="display:flex;justify-content:space-between">
             <div style="flex:1">
@@ -906,7 +990,7 @@ function renderSchedule(t){
               ${ev.memo?`<div class="tiny" style="margin-bottom:4px">${ev.memo}</div>`:''}
               <div style="display:flex;align-items:center;gap:4px">${avatar(ev.member,16)}<span class="tiny">${ev.member}</span></div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;flex-direction:column;gap:4px;margin-left:6px">
               <button class="btn-edit" style="font-size:10px;padding:2px 7px" onclick='editScheduleItem(${escJ(ev)})'>編集</button>
               <button style="background:none;border:none;cursor:pointer;color:#EF4444;font-size:13px" onclick="deleteSchedule(${ev.id})">削除</button>
             </div>
@@ -914,30 +998,27 @@ function renderSchedule(t){
         </div>
       </div>`).join('')}</div>`:'<div class="empty" style="margin-top:16px">この日の予定はまだありません</div>'}
     <div style="display:flex;justify-content:space-between;margin-top:16px">
-      <button class="btn-sec" onclick="if(window.activeDay>0){selectDay(window.activeDay-1)}" ${window.activeDay===0?'disabled style="opacity:0.35"':''}>← 前の日</button>
-      <button class="btn-sec" onclick="if(window.activeDay<${days.length-1}){selectDay(window.activeDay+1)}" ${window.activeDay===days.length-1?'disabled style="opacity:0.35"':''}>次の日 →</button>
+      <button class="btn-sec" onclick="if(window.activeDay>0)selectDay(window.activeDay-1)" ${window.activeDay===0?'disabled style="opacity:0.35"':''}>← 前の日</button>
+      <button class="btn-sec" onclick="if(window.activeDay<${days.length-1})selectDay(window.activeDay+1)" ${window.activeDay===days.length-1?'disabled style="opacity:0.35"':''}>次の日 →</button>
     </div>`;
 }
-
 window.selectDay=function(i){window.activeDay=i;renderTab('schedule');};
 
 function populateScheduleModal(){
   const t=window.activeTrip;
-  const daySelect=document.getElementById('as-day');
-  daySelect.innerHTML=(t.days||[]).map((d,i)=>`<option value="${i}" ${i===window.activeDay?'selected':''}>${d.date} ${d.label}</option>`).join('');
-  document.getElementById('as-cat-chips').innerHTML=CATS.map(c=>`<button class="chip${document.getElementById('as-cat').value===c?' active':''}" onclick="selectChip('as-cat','${c}',this)">${CAT_ICON[c]} ${c}</button>`).join('');
-  document.getElementById('as-member-chips').innerHTML=[...MEMBERS,'両方'].map(m=>`<button class="chip${document.getElementById('as-member').value===m?' active':''}" onclick="selectChip('as-member','${m}',this)">${m}</button>`).join('');
+  document.getElementById('as-day').innerHTML=(t.days||[]).map((d,i)=>`<option value="${i}" ${i===window.activeDay?'selected':''}>${d.date} ${d.label}</option>`).join('');
+  const cat=document.getElementById('as-cat').value||'観光';
+  const mem=document.getElementById('as-member').value||'両方';
+  document.getElementById('as-cat-chips').innerHTML=CATS.map(c=>`<button class="chip${c===cat?' active':''}" onclick="selectChip('as-cat','${c}',this)">${CAT_ICON[c]} ${c}</button>`).join('');
+  document.getElementById('as-member-chips').innerHTML=[...MEMBERS,'両方'].map(m=>`<button class="chip${m===mem?' active':''}" onclick="selectChip('as-member','${m}',this)">${m}</button>`).join('');
 }
-
 window.openScheduleModal=function(){
   document.getElementById('scheduleModalTitle').textContent='予定を追加';
   document.getElementById('as-id').value='';
   ['as-time','as-endtime','as-title','as-memo'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('as-cat').value='観光';document.getElementById('as-member').value='両方';
-  populateScheduleModal();
-  showModal('editScheduleModal');
+  populateScheduleModal();showModal('editScheduleModal');
 };
-
 window.editScheduleItem=function(ev){
   document.getElementById('scheduleModalTitle').textContent='予定を編集';
   document.getElementById('as-id').value=ev.id;
@@ -948,11 +1029,9 @@ window.editScheduleItem=function(ev){
   document.getElementById('as-cat').value=ev.cat||'観光';
   document.getElementById('as-member').value=ev.member||'両方';
   populateScheduleModal();
-  // set correct day
   document.getElementById('as-day').value=ev.day;
   showModal('editScheduleModal');
 };
-
 window.saveSchedule=function(){
   const title=document.getElementById('as-title').value.trim();if(!title)return;
   const id=document.getElementById('as-id').value;
@@ -976,10 +1055,7 @@ function renderChecklist(t){
   else filtered=items.filter(i=>i.cat===f);
   const checked=items.filter(i=>i.checked).length;
   const pct=items.length?Math.round((checked/items.length)*100):0;
-
-  // which cats have items in filtered
   const activeCats=allCats.filter(cat=>filtered.some(i=>i.cat===cat));
-
   return `
     <div class="row"><div><h1 class="page-title">持ち物リスト</h1><div class="sub">${checked}/${items.length} 完了</div></div><button class="btn-primary" onclick="openCheckModal()">＋ 追加</button></div>
     <div class="card" style="margin-bottom:16px">
@@ -1010,9 +1086,7 @@ function renderChecklist(t){
     }).join(''):'<div class="empty">持ち物がまだありません</div>'}
     ${items.length>0?`<button class="btn-danger" style="width:100%;margin-top:8px" onclick="resetChecklist()">✓ チェックをリセット</button>`:''}`;
 }
-
 window.setCheckFilter=function(f){window.checkFilter=f;renderTab('checklist');};
-
 window.openCheckModal=function(){
   document.getElementById('checkModalTitle').textContent='持ち物を追加';
   document.getElementById('ack-id').value='';document.getElementById('ack-name').value='';
@@ -1044,22 +1118,16 @@ window.addCustomCheckCat=function(){
 window.saveCheckItem=function(){
   const id=document.getElementById('ack-id').value;
   const name=document.getElementById('ack-name').value.trim();if(!name)return;
-  const item={id:id?parseInt(id):Date.now(),name,cat:document.getElementById('ack-cat').value,member:document.getElementById('ack-member').value,checked:false};
   const existing=(window.activeTrip.checklist||[]).find(i=>i.id==id);
-  if(existing)item.checked=existing.checked;
+  const item={id:id?parseInt(id):Date.now(),name,cat:document.getElementById('ack-cat').value,member:document.getElementById('ack-member').value,checked:existing?existing.checked:false};
   const checklist=id?(window.activeTrip.checklist||[]).map(i=>i.id==id?item:i):[...(window.activeTrip.checklist||[]),item];
   updateTrip({checklist});hideModal('editCheckModal');
 };
-window.toggleCheck=function(id){
-  updateTrip({checklist:(window.activeTrip.checklist||[]).map(i=>i.id===id?{...i,checked:!i.checked}:i)});
-};
-window.deleteCheck=function(id){
-  updateTrip({checklist:(window.activeTrip.checklist||[]).filter(i=>i.id!==id)});
-};
+window.toggleCheck=function(id){updateTrip({checklist:(window.activeTrip.checklist||[]).map(i=>i.id===id?{...i,checked:!i.checked}:i)});};
+window.deleteCheck=function(id){updateTrip({checklist:(window.activeTrip.checklist||[]).filter(i=>i.id!==id)});};
 window.resetChecklist=function(){
   if(!confirm('全てのチェックをリセットしますか？'))return;
-  const checklist=(window.activeTrip.checklist||[]).map(i=>({...i,checked:false}));
-  updateTrip({checklist});
+  updateTrip({checklist:(window.activeTrip.checklist||[]).map(i=>({...i,checked:false}))});
 };
 
 renderTripList();
