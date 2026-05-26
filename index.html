@@ -7,7 +7,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="TabiShare">
 <meta name="theme-color" content="#ffffff">
-<link rel="manifest" href="manifest.json">
 <title>TabiShare</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -27,6 +26,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-sec{background:#fff;border-radius:8px;padding:8px 14px;border:0.5px solid #D1D5DB;color:#374151;font-size:13px;cursor:pointer;}
 .btn-danger{background:#FEF2F2;border-radius:8px;padding:8px 14px;border:0.5px solid #FECACA;color:#EF4444;font-size:13px;cursor:pointer;}
 .btn-edit{background:#F0FDF4;border-radius:8px;padding:4px 10px;border:0.5px solid #BBF7D0;color:#166534;font-size:12px;cursor:pointer;}
+.btn-archive{background:#FFF7ED;border-radius:8px;padding:4px 10px;border:0.5px solid #FED7AA;color:#C2410C;font-size:11px;cursor:pointer;white-space:nowrap;}
 .row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 .chip{display:inline-flex;padding:4px 10px;border-radius:99px;border:0.5px solid #D1D5DB;font-size:12px;cursor:pointer;background:#fff;color:#6B7280;white-space:nowrap;}
 .chip.active{border-width:2px;border-color:#3B82F6;background:#EFF6FF;color:#1D4ED8;font-weight:600;}
@@ -49,7 +49,7 @@ h1.page-title{font-size:20px;font-weight:700;margin-bottom:4px;}
 .sub{font-size:13px;color:#6B7280;}
 .tiny{font-size:12px;color:#6B7280;}
 .note-box{background:#F9FAFB;border-radius:6px;padding:8px;margin-top:8px;font-size:12px;color:#6B7280;line-height:1.6;}
-.trip-card{background:#fff;border-radius:16px;padding:16px;border:0.5px solid #E5E7EB;margin-bottom:12px;cursor:pointer;}
+.trip-card{background:#fff;border-radius:16px;padding:16px;border:0.5px solid #E5E7EB;margin-bottom:12px;}
 .cover-box{width:52px;height:52px;border-radius:14px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0;}
 .stat-box{background:#F9FAFB;border-radius:8px;padding:6px 4px;text-align:center;}
@@ -72,8 +72,9 @@ h1.page-title{font-size:20px;font-weight:700;margin-bottom:4px;}
 <!-- TRIP LIST -->
 <div class="screen active" id="screen-triplist">
   <div class="header">
-    <div style="flex:1"><h1 style="font-size:18px;font-weight:700">TabiShare ✈️</h1><div class="sub">旅行一覧</div></div>
-    <button class="btn-primary" onclick="showModal('newTripModal')">＋ 新しい旅行</button>
+    <div style="flex:1"><h1 style="font-size:18px;font-weight:700">TabiShare ✈️</h1><div class="sub" id="tripListSubtitle">旅行一覧</div></div>
+    <button class="btn-sec" style="font-size:12px;padding:6px 10px;margin-right:6px" id="archiveToggleBtn" onclick="toggleArchiveView()">過去の旅行</button>
+    <button class="btn-primary" id="newTripBtn" onclick="showModal('newTripModal')">＋ 新しい旅行</button>
   </div>
   <div class="scroll" id="tripListContainer"></div>
 </div>
@@ -89,7 +90,7 @@ h1.page-title{font-size:20px;font-weight:700;margin-bottom:4px;}
   <div class="scroll" id="tripDetailContent"></div>
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('home')" id="nav-home"><span>🏠</span><small>ホーム</small></button>
-    <button class="nav-btn" onclick="switchTab('booking')" id="nav-booking"><span>✈️</span><small>予約</small></button>
+    <button class="nav-btn" onclick="switchTab('booking')" id="nav-booking"><span>🏨</span><small>予約</small></button>
     <button class="nav-btn" onclick="switchTab('insurance')" id="nav-insurance"><span>🛡️</span><small>保険</small></button>
     <button class="nav-btn" onclick="switchTab('places')" id="nav-places"><span>🗺️</span><small>場所</small></button>
     <button class="nav-btn" onclick="switchTab('budget')" id="nav-budget"><span>💰</span><small>予算</small></button>
@@ -150,9 +151,9 @@ h1.page-title{font-size:20px;font-weight:700;margin-bottom:4px;}
 
 <div class="modal-overlay" id="editHotelModal">
   <div class="modal-box">
-    <div class="modal-header"><strong id="hotelModalTitle">ホテルを追加</strong><button onclick="hideModal('editHotelModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
+    <div class="modal-header"><strong id="hotelModalTitle">宿泊を追加</strong><button onclick="hideModal('editHotelModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
     <input type="hidden" id="eh-id">
-    <label class="tiny">ホテル名</label><input class="input" id="eh-name" placeholder="例：Hotel Le Marais">
+    <label class="tiny">宿泊施設名</label><input class="input" id="eh-name" placeholder="例：Hotel Le Marais">
     <label class="tiny">チェックイン</label><input class="input" id="eh-checkIn" type="date">
     <label class="tiny">チェックアウト</label><input class="input" id="eh-checkOut" type="date">
     <label class="tiny">泊数</label><input class="input" id="eh-nights" type="number" placeholder="例：7">
@@ -215,10 +216,9 @@ h1.page-title{font-size:20px;font-weight:700;margin-bottom:4px;}
 <div class="modal-overlay" id="editExpModal">
   <div class="modal-box">
     <div class="modal-header"><strong id="editExpTitle">支出を編集</strong><button onclick="hideModal('editExpModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
-    <input type="hidden" id="ee-id">
-    <input type="hidden" id="ee-cat">
+    <input type="hidden" id="ee-id"><input type="hidden" id="ee-cat">
     <input class="input" id="ee-desc" placeholder="内容（例：ディナー）">
-    <label class="tiny">金額（円）</label><input class="input" id="ee-amount" type="number" placeholder="例：5000">
+    <label class="tiny">金額（円）</label><input class="input" id="ee-amount" type="number">
     <label class="tiny">支払者</label><div class="chip-row" id="ee-member-chips"></div><input type="hidden" id="ee-paidBy" value="ケンケン">
     <input class="input" id="ee-date" type="date">
     <div style="display:flex;gap:8px;margin-top:8px;">
@@ -245,7 +245,7 @@ h1.page-title{font-size:20px;font-weight:700;margin-bottom:4px;}
 
 <div class="modal-overlay" id="settlementModal">
   <div class="modal-box">
-    <div class="modal-header"><strong>精算を記録</strong><button onclick="hideModal('settlementModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
+    <div class="modal-header"><strong id="settlementModalTitle">精算を記録</strong><button onclick="hideModal('settlementModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>
     <input type="hidden" id="sl-id">
     <label class="tiny">精算日</label><input class="input" id="sl-date" type="date">
     <label class="tiny">精算金額（円）</label><input class="input" id="sl-amount" type="number" placeholder="例：15000">
@@ -313,8 +313,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
-// オフライン永続化（Firebaseネイティブ対応）
 enableIndexedDbPersistence(db).catch(()=>{});
 signInAnonymously(auth).catch(console.error);
 
@@ -339,45 +337,29 @@ window.activeDay=0;
 window.placesFilter='すべて';
 window.checkFilter='すべて';
 window.isOnline=navigator.onLine;
+window.showingArchive=false;
 window.currentBudgetCat=null;
 
-window.addEventListener('online',()=>{
-  window.isOnline=true;
-  document.getElementById('offlineBanner').classList.remove('show');
-});
-window.addEventListener('offline',()=>{
-  window.isOnline=false;
-  document.getElementById('offlineBanner').classList.add('show');
-});
-if(!navigator.onLine) document.getElementById('offlineBanner').classList.add('show');
+window.addEventListener('online',()=>{window.isOnline=true;document.getElementById('offlineBanner').classList.remove('show');});
+window.addEventListener('offline',()=>{window.isOnline=false;document.getElementById('offlineBanner').classList.add('show');});
+if(!navigator.onLine)document.getElementById('offlineBanner').classList.add('show');
 
-// Firebase の onSnapshot はオフライン時もキャッシュから読む
 onSnapshot(collection(db,'trips'),snapshot=>{
-  if(!snapshot.empty){
-    window.trips=snapshot.docs.map(d=>({...d.data(),id:d.id}));
-  }
+  if(!snapshot.empty)window.trips=snapshot.docs.map(d=>({...d.data(),id:d.id}));
   renderTripList();
   if(window.activeTrip){
-    const updated=window.trips.find(t=>t.id===window.activeTrip.id);
-    if(updated){window.activeTrip=updated;renderTab(window.activeTab);}
+    const u=window.trips.find(t=>t.id===window.activeTrip.id);
+    if(u){window.activeTrip=u;renderTab(window.activeTab);}
   }
 });
 
-async function saveTrip(trip){
-  try{await setDoc(doc(db,'trips',trip.id),trip);}
-  catch(e){console.warn('保存失敗（オフライン時はキャッシュ保存）',e);}
-}
-async function removeTrip(id){
-  window.trips=window.trips.filter(t=>t.id!==id);
-  renderTripList();
-  try{await deleteDoc(doc(db,'trips',id));}catch(e){}
-}
+async function saveTrip(trip){try{await setDoc(doc(db,'trips',trip.id),trip);}catch(e){console.warn(e);}}
+async function removeTrip(id){window.trips=window.trips.filter(t=>t.id!==id);renderTripList();try{await deleteDoc(doc(db,'trips',id));}catch(e){}}
 function updateTrip(data){
-  const updated={...window.activeTrip,...data};
-  window.activeTrip=updated;
-  window.trips=window.trips.map(t=>t.id===updated.id?updated:t);
-  saveTrip(updated);
-  renderTab(window.activeTab);
+  const u={...window.activeTrip,...data};
+  window.activeTrip=u;
+  window.trips=window.trips.map(t=>t.id===u.id?u:t);
+  saveTrip(u);renderTab(window.activeTab);
 }
 
 // ── helpers ──
@@ -390,9 +372,7 @@ function tripStatus(t){
   return{label:'終了',bg:'#F1EFE8',color:'#5F5E5A'};
 }
 function totalNights(t){return(t.hotels||[]).reduce((a,h)=>a+(parseInt(h.nights)||0),0);}
-function avatar(name,size=24){
-  return `<div class="avatar" style="width:${size}px;height:${size}px;background:${MEMBER_BG[name]||'#F1EFE8'};color:${MEMBER_COLOR[name]||'#5F5E5A'};font-size:${size*0.38}px">${name==='両方'?'両':name[0]}</div>`;
-}
+function avatar(name,size=24){return `<div class="avatar" style="width:${size}px;height:${size}px;background:${MEMBER_BG[name]||'#F1EFE8'};color:${MEMBER_COLOR[name]||'#5F5E5A'};font-size:${size*0.38}px">${name==='両方'?'両':name[0]}</div>`;}
 function badge(label,bg,color){return `<span class="badge" style="background:${bg};color:${color}">${label}</span>`;}
 function progBar(pct){const c=pct>100?'#E24B4A':pct>80?'#EF9F27':'#1D9E75';return `<div class="prog-bar"><div class="prog-fill" style="width:${Math.min(pct,100)}%;background:${c}"></div></div>`;}
 function getCheckCats(){return[...CHECK_CATS,...(window.activeTrip?.customCheckCats||[]).filter(c=>!CHECK_CATS.includes(c))];}
@@ -407,27 +387,53 @@ window.selectChip=function(inputId,val,el){
 window.showModal=function(id){document.getElementById(id).classList.add('active');};
 window.hideModal=function(id){document.getElementById(id).classList.remove('active');};
 
+// ── ARCHIVE ──
+window.toggleArchiveView=function(){
+  window.showingArchive=!window.showingArchive;
+  document.getElementById('archiveToggleBtn').textContent=window.showingArchive?'← アクティブ':'過去の旅行';
+  document.getElementById('newTripBtn').style.display=window.showingArchive?'none':'';
+  document.getElementById('tripListSubtitle').textContent=window.showingArchive?'過去の旅行':'旅行一覧';
+  renderTripList();
+};
+window.archiveTrip=function(id){
+  const t=window.trips.find(t=>t.id===id);if(!t)return;
+  if(!confirm('「'+t.name+'」を過去の旅行に移しますか？'))return;
+  const updated={...t,archived:true};
+  window.trips=window.trips.map(x=>x.id===id?updated:x);
+  saveTrip(updated);renderTripList();
+};
+window.unarchiveTrip=function(id){
+  const t=window.trips.find(t=>t.id===id);if(!t)return;
+  const updated={...t,archived:false};
+  window.trips=window.trips.map(x=>x.id===id?updated:x);
+  saveTrip(updated);renderTripList();
+};
+
 // ── TRIP LIST ──
 function renderTripList(){
   const cp=document.getElementById('coverPicker');
   if(cp)cp.innerHTML=COVERS.map(c=>`<button class="chip${c==='🗼'?' active':''}" onclick="selectChip('nt-cover','${c}',this)">${c}</button>`).join('');
   const cont=document.getElementById('tripListContainer');
-  if(!window.trips.length){
-    cont.innerHTML=`<div style="text-align:center;padding:60px 0"><div style="font-size:40px;margin-bottom:12px">🌍</div><p class="sub" style="margin-bottom:16px">旅行がまだありません</p><button class="btn-primary" onclick="showModal('newTripModal')">＋ 最初の旅行を追加</button></div>`;
+  const showing=window.showingArchive;
+  const filtered=[...window.trips]
+    .filter(t=>showing?t.archived:!t.archived)
+    .sort((a,b)=>(a.startDate||'').localeCompare(b.startDate||''));
+  if(!filtered.length){
+    cont.innerHTML=`<div style="text-align:center;padding:60px 0"><div style="font-size:40px;margin-bottom:12px">${showing?'📦':'🌍'}</div><p class="sub" style="margin-bottom:16px">${showing?'過去の旅行はありません':'旅行がまだありません'}</p>${!showing?'<button class="btn-primary" onclick="showModal(\'newTripModal\')">＋ 最初の旅行を追加</button>':''}</div>`;
     return;
   }
-  // 出発日順に並び替え
-  const sorted=[...window.trips].sort((a,b)=>(a.startDate||'').localeCompare(b.startDate||''));
-  cont.innerHTML=sorted.map(t=>{
+  cont.innerHTML=filtered.map(t=>{
     const st=tripStatus(t);
     const totalB=(t.budgets||[]).reduce((a,b)=>a+(b.budgetJPY||0),0);
     const totalS=(t.expenses||[]).reduce((a,e)=>a+(e.amountJPY||0),0);
     const pct=totalB>0?Math.round((totalS/totalB)*100):0;
     const nights=totalNights(t);
-    return `<div class="trip-card" onclick="openTrip('${t.id}')">
+    const hideFlight=t.hideFlights;
+    const hideIns=t.hideInsurance;
+    return `<div class="trip-card">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
-        <div class="cover-box">${t.cover}</div>
-        <div style="flex:1">
+        <div class="cover-box" onclick="openTrip('${t.id}')" style="cursor:pointer">${t.cover}</div>
+        <div style="flex:1;cursor:pointer" onclick="openTrip('${t.id}')">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
             <strong style="font-size:17px">${t.name}</strong>
             <span class="badge" style="background:${st.bg};color:${st.color}">${st.label}</span>
@@ -435,15 +441,21 @@ function renderTripList(){
           <div class="sub">${t.startDate} 〜 ${t.endDate}</div>
           <div style="display:flex;gap:4px;margin-top:4px">${(t.members||[]).map(m=>avatar(m,20)).join('')}</div>
         </div>
-        <button onclick="event.stopPropagation();deleteTripById('${t.id}')" style="background:none;border:none;font-size:18px;color:#9CA3AF;cursor:pointer;padding:4px">✕</button>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+          ${showing
+            ?`<button class="btn-edit" style="font-size:11px;padding:3px 8px" onclick="unarchiveTrip('${t.id}')">戻す</button>`
+            :`<button class="btn-archive" onclick="archiveTrip('${t.id}')">過去の旅行</button>`
+          }
+          <button onclick="deleteTripById('${t.id}')" style="background:none;border:none;font-size:16px;color:#9CA3AF;cursor:pointer;padding:2px">✕</button>
+        </div>
       </div>
-      <div class="stats-grid">
-        <div class="stat-box"><div style="font-size:13px">✈️</div><div class="tiny">${(t.flights||[]).length}便</div></div>
+      <div class="stats-grid" onclick="openTrip('${t.id}')" style="cursor:pointer">
+        ${!hideFlight?`<div class="stat-box"><div style="font-size:13px">✈️</div><div class="tiny">${(t.flights||[]).length}便</div></div>`:'<div class="stat-box"><div style="font-size:13px">✈️</div><div class="tiny" style="color:#D1D5DB">非表示</div></div>'}
         <div class="stat-box"><div style="font-size:13px">🏨</div><div class="tiny">${nights}泊</div></div>
         <div class="stat-box"><div style="font-size:13px">🗺️</div><div class="tiny">${(t.places||[]).length}件</div></div>
         <div class="stat-box"><div style="font-size:13px">✅</div><div class="tiny">${(t.checklist||[]).filter(c=>c.checked).length}/${(t.checklist||[]).length}</div></div>
       </div>
-      ${totalB>0?`<div style="display:flex;justify-content:space-between"><span class="tiny">予算消化率 ${pct}%</span><span class="tiny">${fmt(totalS)} / ${fmt(totalB)}</span></div>${progBar(pct)}`:''}
+      ${totalB>0?`<div style="display:flex;justify-content:space-between;cursor:pointer" onclick="openTrip('${t.id}')"><span class="tiny">予算消化率 ${pct}%</span><span class="tiny">${fmt(totalS)} / ${fmt(totalB)}</span></div>${progBar(pct)}`:''}
     </div>`;
   }).join('');
 }
@@ -471,7 +483,7 @@ window.createTrip=function(){
   if(!name||!start||!end){alert('旅行名・出発日・帰宅日を入力してください');return;}
   const days=[];const d=new Date(start),ed=new Date(end);const DOW=['日','月','火','水','木','金','土'];
   while(d<=ed){days.push({date:(d.getMonth()+1)+'/'+(d.getDate())+'('+DOW[d.getDay()]+')',label:''});d.setDate(d.getDate()+1);}
-  const trip={id:'trip'+Date.now(),name,cover,startDate:start,endDate:end,members:['ケンケン','あき'],flights:[],hotels:[],insurance:[],places:[],expenses:[],settlements:[],budgets:CATS.map(cat=>({cat,budgetJPY:0,note:''})),schedule:[],checklist:[],customCheckCats:[],days};
+  const trip={id:'trip'+Date.now(),name,cover,startDate:start,endDate:end,members:['ケンケン','あき'],flights:[],hotels:[],insurance:[],places:[],expenses:[],settlements:[],budgets:CATS.map(cat=>({cat,budgetJPY:0,note:''})),schedule:[],checklist:[],customCheckCats:[],days,archived:false,hideFlights:false,hideInsurance:false};
   saveTrip(trip);window.trips.push(trip);renderTripList();hideModal('newTripModal');
   ['nt-name','nt-start','nt-end'].forEach(id=>document.getElementById(id).value='');
 };
@@ -543,8 +555,8 @@ function renderHome(t){
       ${totalB>0?`<div style="display:flex;justify-content:space-between"><span class="tiny">予算消化率 ${pct}%</span><span class="tiny">${fmt(totalS)} / ${fmt(totalB)}</span></div>${progBar(pct)}`:''}
     </div>
     <div class="menu-grid">
-      <div class="menu-card" onclick="switchTab('booking')"><div class="menu-icon" style="background:#EEEDFE">✈️</div><strong style="font-size:13px">予約情報</strong><span style="font-size:11px;color:#3C3489">${(t.flights||[]).length}便 · ${nights}泊</span></div>
-      <div class="menu-card" onclick="switchTab('insurance')"><div class="menu-icon" style="background:#E1F5EE">🛡️</div><strong style="font-size:13px">保険</strong><span style="font-size:11px;color:#085041">${(t.insurance||[]).length}件</span></div>
+      <div class="menu-card" onclick="switchTab('booking')"><div class="menu-icon" style="background:#EEEDFE">🏨</div><strong style="font-size:13px">予約情報</strong><span style="font-size:11px;color:#3C3489">${t.hideFlights?'':((t.flights||[]).length+'便 · ')}${nights}泊</span></div>
+      <div class="menu-card" onclick="switchTab('insurance')"><div class="menu-icon" style="background:#E1F5EE">🛡️</div><strong style="font-size:13px">保険</strong><span style="font-size:11px;color:#085041">${t.hideInsurance?'非表示':((t.insurance||[]).length+'件')}</span></div>
       <div class="menu-card" onclick="switchTab('places')"><div class="menu-icon" style="background:#E6F1FB">🗺️</div><strong style="font-size:13px">行きたい場所</strong><span style="font-size:11px;color:#0C447C">${(t.places||[]).length}件</span></div>
       <div class="menu-card" onclick="switchTab('budget')"><div class="menu-icon" style="background:#FAEEDA">💰</div><strong style="font-size:13px">予算・支出</strong><span style="font-size:11px;color:#854F0B">消化率 ${pct}%</span></div>
       <div class="menu-card" onclick="switchTab('schedule')"><div class="menu-icon" style="background:#E6F1FB">📅</div><strong style="font-size:13px">スケジュール</strong><span style="font-size:11px;color:#0C447C">${(t.days||[]).length}日間</span></div>
@@ -554,31 +566,44 @@ function renderHome(t){
 
 // ── BOOKING ──
 function renderBooking(t){
+  const hideFlight=t.hideFlights;
+  const hideIns=t.hideInsurance;
   return `
     <h1 class="page-title">予約情報</h1>
+
+    <!-- 航空券セクション -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px">
-      <div class="section-title">✈️ 航空券</div>
-      <button class="btn-primary" onclick="openFlightModal()">＋ 追加</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="section-title" style="margin-bottom:0">✈️ 航空券</div>
+        <button onclick="toggleHideFlights()" class="chip" style="font-size:10px;padding:2px 8px;${hideFlight?'background:#FEF2F2;border-color:#FECACA;color:#EF4444':''}">
+          ${hideFlight?'👁 表示する':'👁 非表示'}
+        </button>
+      </div>
+      ${!hideFlight?`<button class="btn-primary" onclick="openFlightModal()">＋ 追加</button>`:''}
     </div>
-    ${(t.flights||[]).length?(t.flights||[]).map(b=>`
-      <div class="card">
-        <div class="row">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">✈️ <strong>${b.airline} ${b.flightNo}</strong>${badge(b.cls||'','#EEEDFE','#3C3489')}</div>
-          <div style="display:flex;gap:6px">
-            <button class="btn-edit" onclick='editFlight(${escJ(b)})'>編集</button>
-            <button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteFlight(${b.id})">削除</button>
+    ${hideFlight
+      ?`<div class="card" style="background:#FEF9F9;border-color:#FECACA;margin-bottom:16px"><div class="tiny" style="color:#EF4444;text-align:center">航空券は非表示設定中です</div></div>`
+      :(t.flights||[]).length?(t.flights||[]).map(b=>`
+        <div class="card">
+          <div class="row">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">✈️ <strong>${b.airline} ${b.flightNo}</strong>${badge(b.cls||'','#EEEDFE','#3C3489')}</div>
+            <div style="display:flex;gap:6px">
+              <button class="btn-edit" onclick='editFlight(${escJ(b)})'>編集</button>
+              <button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteFlight(${b.id})">削除</button>
+            </div>
           </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-          <div style="flex:1"><strong>${b.from}</strong><div class="tiny">${b.departure}</div></div>
-          <span style="color:#9CA3AF">→</span>
-          <div style="flex:1;text-align:right"><strong>${b.to}</strong><div class="tiny">${b.arrival}</div></div>
-        </div>
-        <div class="tiny" style="margin-top:8px;padding-top:8px;border-top:0.5px solid #E5E7EB">確認番号：${b.confirmNo}</div>
-        ${b.note?`<div class="note-box">📝 ${b.note}</div>`:''}
-      </div>`).join(''):'<div class="empty">航空券がまだありません</div>'}
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+            <div style="flex:1"><strong>${b.from}</strong><div class="tiny">${b.departure}</div></div>
+            <span style="color:#9CA3AF">→</span>
+            <div style="flex:1;text-align:right"><strong>${b.to}</strong><div class="tiny">${b.arrival}</div></div>
+          </div>
+          <div class="tiny" style="margin-top:8px;padding-top:8px;border-top:0.5px solid #E5E7EB">確認番号：${b.confirmNo}</div>
+          ${b.note?`<div class="note-box">📝 ${b.note}</div>`:''}
+        </div>`).join(''):'<div class="empty">航空券がまだありません</div>'}
+
+    <!-- 宿泊セクション -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px">
-      <div class="section-title">🏨 ホテル</div>
+      <div class="section-title" style="margin-bottom:0">🏨 宿泊</div>
       <button class="btn-primary" onclick="openHotelModal()">＋ 追加</button>
     </div>
     ${(t.hotels||[]).length?(t.hotels||[]).map(b=>`
@@ -599,8 +624,10 @@ function renderBooking(t){
         ${b.note?`<div class="note-box">📋 ${b.note}</div>`:''}
         ${b.free?`<div class="note-box">📝 ${b.free}</div>`:''}
         <div class="tiny" style="margin-top:6px">確認番号：${b.confirmNo}</div>
-      </div>`).join(''):'<div class="empty">ホテルがまだありません</div>'}`;
+      </div>`).join(''):'<div class="empty">宿泊情報がまだありません</div>'}`;
 }
+
+window.toggleHideFlights=function(){updateTrip({hideFlights:!window.activeTrip.hideFlights});};
 
 window.openFlightModal=function(){
   document.getElementById('flightModalTitle').textContent='航空券を追加';
@@ -627,7 +654,7 @@ window.saveFlight=function(){
 window.deleteFlight=function(id){if(!confirm('削除しますか？'))return;updateTrip({flights:(window.activeTrip.flights||[]).filter(b=>b.id!==id)});};
 
 window.openHotelModal=function(){
-  document.getElementById('hotelModalTitle').textContent='ホテルを追加';
+  document.getElementById('hotelModalTitle').textContent='宿泊を追加';
   document.getElementById('eh-id').value='';
   ['eh-name','eh-nights','eh-confirmNo','eh-note','eh-free','eh-mapUrl'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('eh-checkIn').value='';document.getElementById('eh-checkOut').value='';
@@ -636,7 +663,7 @@ window.openHotelModal=function(){
   showModal('editHotelModal');
 };
 window.editHotel=function(b){
-  document.getElementById('hotelModalTitle').textContent='ホテルを編集';
+  document.getElementById('hotelModalTitle').textContent='宿泊を編集';
   document.getElementById('eh-id').value=b.id;
   document.getElementById('eh-name').value=b.name||'';
   document.getElementById('eh-checkIn').value=b.checkIn||'';
@@ -660,38 +687,46 @@ window.deleteHotel=function(id){if(!confirm('削除しますか？'))return;upda
 
 // ── INSURANCE ──
 function renderInsurance(t){
+  const hide=t.hideInsurance;
   const ins=t.insurance||[];
   return `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h1 class="page-title">🛡️ 保険</h1>
-      <button class="btn-primary" onclick="openInsModal()">＋ 追加</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <h1 class="page-title" style="margin-bottom:0">🛡️ 保険</h1>
+        <button onclick="toggleHideInsurance()" class="chip" style="font-size:10px;padding:2px 8px;${hide?'background:#FEF2F2;border-color:#FECACA;color:#EF4444':''}">
+          ${hide?'👁 表示する':'👁 非表示'}
+        </button>
+      </div>
+      ${!hide?`<button class="btn-primary" onclick="openInsModal()">＋ 追加</button>`:''}
     </div>
-    ${ins.length?ins.map(i=>`
-      <div class="card">
-        <div class="row">
-          <div><strong style="font-size:15px">${i.name}</strong><div style="margin-top:4px">${badge(i.type||'','#E1F5EE','#085041')}</div></div>
-          <div style="display:flex;gap:6px">
-            <button class="btn-edit" onclick='editInsurance(${escJ(i)})'>編集</button>
-            <button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteInsurance(${i.id})">削除</button>
+    ${hide
+      ?`<div class="card" style="background:#FEF9F9;border-color:#FECACA"><div class="tiny" style="color:#EF4444;text-align:center">保険情報は非表示設定中です</div></div>`
+      :ins.length?ins.map(i=>`
+        <div class="card">
+          <div class="row">
+            <div><strong style="font-size:15px">${i.name}</strong><div style="margin-top:4px">${badge(i.type||'','#E1F5EE','#085041')}</div></div>
+            <div style="display:flex;gap:6px">
+              <button class="btn-edit" onclick='editInsurance(${escJ(i)})'>編集</button>
+              <button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteInsurance(${i.id})">削除</button>
+            </div>
           </div>
-        </div>
-        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:13px">
-          ${i.paidBy?`<div><div class="tiny">支払者</div><div style="display:flex;align-items:center;gap:4px;margin-top:2px">${avatar(i.paidBy,16)}<span>${i.paidBy}</span></div></div>`:''}
-          ${i.amount?`<div><div class="tiny">保険料</div><strong>${fmt(parseInt(i.amount))}</strong></div>`:''}
-          ${i.date?`<div><div class="tiny">支払日</div><strong>${i.date}</strong></div>`:''}
-        </div>
-        ${i.no?`<div class="tiny" style="margin-top:6px">証券番号：${i.no}</div>`:''}
-        ${i.note?`<div class="note-box">📝 ${i.note}</div>`:''}
-        ${i.pdf?`<div class="note-box">📎 添付ファイル: ${i.pdf}</div>`:''}
-      </div>`).join(''):'<div class="empty">保険情報がまだありません</div>'}`;
+          <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:13px">
+            ${i.paidBy?`<div><div class="tiny">支払者</div><div style="display:flex;align-items:center;gap:4px;margin-top:2px">${avatar(i.paidBy,16)}<span>${i.paidBy}</span></div></div>`:''}
+            ${i.amount?`<div><div class="tiny">保険料</div><strong>${fmt(parseInt(i.amount))}</strong></div>`:''}
+            ${i.date?`<div><div class="tiny">支払日</div><strong>${i.date}</strong></div>`:''}
+          </div>
+          ${i.no?`<div class="tiny" style="margin-top:6px">証券番号：${i.no}</div>`:''}
+          ${i.note?`<div class="note-box">📝 ${i.note}</div>`:''}
+          ${i.pdf?`<div class="note-box">📎 添付ファイル: ${i.pdf}</div>`:''}
+        </div>`).join(''):'<div class="empty">保険情報がまだありません</div>'}`;
 }
+window.toggleHideInsurance=function(){updateTrip({hideInsurance:!window.activeTrip.hideInsurance});};
 window.openInsModal=function(){
   document.getElementById('insModalTitle').textContent='保険を追加';
   document.getElementById('ei-id').value='';
   ['ei-name','ei-amount','ei-no','ei-note','ei-pdf'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ei-date').value='';
-  document.getElementById('ei-type').value='海外旅行保険';
-  document.getElementById('ei-paidBy').value='ケンケン';
+  document.getElementById('ei-type').value='海外旅行保険';document.getElementById('ei-paidBy').value='ケンケン';
   document.getElementById('ei-type-chips').innerHTML=INS_TYPES.map(t=>`<button class="chip${t==='海外旅行保険'?' active':''}" onclick="selectChip('ei-type','${t}',this)">${t}</button>`).join('');
   document.getElementById('ei-member-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m==='ケンケン'?' active':''}" onclick="selectChip('ei-paidBy','${m}',this)">${m}</button>`).join('');
   showModal('editInsuranceModal');
@@ -699,14 +734,10 @@ window.openInsModal=function(){
 window.editInsurance=function(i){
   document.getElementById('insModalTitle').textContent='保険を編集';
   document.getElementById('ei-id').value=i.id;
-  document.getElementById('ei-name').value=i.name||'';
-  document.getElementById('ei-amount').value=i.amount||'';
-  document.getElementById('ei-date').value=i.date||'';
-  document.getElementById('ei-no').value=i.no||'';
-  document.getElementById('ei-note').value=i.note||'';
-  document.getElementById('ei-pdf').value=i.pdf||'';
-  document.getElementById('ei-type').value=i.type||'海外旅行保険';
-  document.getElementById('ei-paidBy').value=i.paidBy||'ケンケン';
+  document.getElementById('ei-name').value=i.name||'';document.getElementById('ei-amount').value=i.amount||'';
+  document.getElementById('ei-date').value=i.date||'';document.getElementById('ei-no').value=i.no||'';
+  document.getElementById('ei-note').value=i.note||'';document.getElementById('ei-pdf').value=i.pdf||'';
+  document.getElementById('ei-type').value=i.type||'海外旅行保険';document.getElementById('ei-paidBy').value=i.paidBy||'ケンケン';
   document.getElementById('ei-type-chips').innerHTML=INS_TYPES.map(t=>`<button class="chip${t===(i.type||'海外旅行保険')?' active':''}" onclick="selectChip('ei-type','${t}',this)">${t}</button>`).join('');
   document.getElementById('ei-member-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m===(i.paidBy||'ケンケン')?' active':''}" onclick="selectChip('ei-paidBy','${m}',this)">${m}</button>`).join('');
   showModal('editInsuranceModal');
@@ -722,13 +753,16 @@ window.deleteInsurance=function(id){if(!confirm('削除しますか？'))return;
 // ── PLACES ──
 function renderPlaces(t){
   const f=window.placesFilter;
-  const places=(t.places||[]).filter(p=>f==='すべて'||p.prio===f);
-  const must=places.filter(p=>p.prio==='絶対行く');
-  const nice=places.filter(p=>p.prio==='できれば');
+  const all=t.places||[];
+  const must=all.filter(p=>p.prio==='絶対行く');
+  const nice=all.filter(p=>p.prio==='できれば');
+  const shown=f==='すべて'?all:f==='絶対行く'?must:nice;
+  const mustShown=f==='すべて'||f==='絶対行く'?must:[];
+  const niceShown=f==='すべて'||f==='できれば'?nice:[];
   return `
-    <div class="row"><div><h1 class="page-title">行きたい場所</h1><div class="sub">${(t.places||[]).length}件</div></div><button class="btn-primary" onclick="openPlaceModal()">＋ 追加</button></div>
-    <div class="chip-row">${['すべて','絶対行く','できれば'].map(p=>`<button class="chip${f===p?' active':''}" onclick="window.placesFilter='${p}';renderTab('places')">${p}</button>`).join('')}</div>
-    ${[['絶対行く','#FAEEDA','#854F0B',must],['できれば','#F1EFE8','#5F5E5A',nice]].map(([title,bg,color,items])=>items.length?`
+    <div class="row"><div><h1 class="page-title">行きたい場所</h1><div class="sub">${all.length}件</div></div><button class="btn-primary" onclick="openPlaceModal()">＋ 追加</button></div>
+    <div class="chip-row">${['すべて','絶対行く','できれば'].map(p=>`<button class="chip${f===p?' active':''}" onclick="setPlacesFilter('${p}')">${p}</button>`).join('')}</div>
+    ${[['絶対行く','#FAEEDA','#854F0B',mustShown],['できれば','#F1EFE8','#5F5E5A',niceShown]].map(([title,bg,color,items])=>items.length?`
       <div style="margin-bottom:16px">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">${badge(title,bg,color)}<span class="tiny">${items.length}件</span></div>
         ${items.map((p,i)=>`<div class="card" style="margin-bottom:8px">
@@ -749,8 +783,9 @@ function renderPlaces(t){
           </div>
         </div>`).join('')}
       </div>`:'').join('')}
-    ${!places.length?'<div class="empty">場所がまだありません</div>':''}`;
+    ${!shown.length?'<div class="empty">場所がまだありません</div>':''}`;
 }
+window.setPlacesFilter=function(f){window.placesFilter=f;renderTab('places');};
 window.openPlaceModal=function(){
   document.getElementById('placeModalTitle').textContent='場所を追加';
   document.getElementById('ap-id').value='';
@@ -793,7 +828,7 @@ function renderBudget(t){
   const settled=(t.settlements||[]).reduce((a,s)=>a+(parseInt(s.amount)||0),0);
   const memberData=(t.members||[]).map(m=>({name:m,total:(t.expenses||[]).filter(e=>e.paidBy===m).reduce((a,e)=>a+e.amountJPY,0)}));
   const diff=memberData.length>=2?Math.abs(memberData[0].total-memberData[1].total)/2:0;
-  const remaining=diff-settled;
+  const remaining=Math.max(diff-settled,0);
   return `
     <h1 class="page-title">予算・支出管理</h1>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0">
@@ -817,26 +852,23 @@ function renderBudget(t){
         ${b.note?`<div class="note-box">📋 ${b.note}</div>`:''}
       </div>`;
     }).join('')}
-
     <div class="section-title" style="margin:16px 0 10px">メンバー別</div>
     ${memberData.map(({name,total})=>`
       <div class="card" style="margin-bottom:10px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">${avatar(name,34)}<div><strong style="font-size:15px">${name}</strong><div class="tiny">合計: <strong>${fmt(total)}</strong></div></div></div>
         ${CATS.map(cat=>{const items=(t.expenses||[]).filter(e=>e.paidBy===name&&e.cat===cat);if(!items.length)return'';const sub=items.reduce((a,e)=>a+e.amountJPY,0);return`<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span class="tiny">${CAT_ICON[cat]} ${cat}</span><span class="tiny">${fmt(sub)}</span></div>`;}).join('')}
       </div>`).join('')}
-
     ${memberData.length>=2&&diff>0?`
     <div class="card" style="background:#F0FDF4;border-color:#BBF7D0;margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <div>
           <div class="tiny">精算</div>
           <div style="font-size:14px;margin-top:2px"><strong>${memberData[0].total>memberData[1].total?memberData[1].name:memberData[0].name}</strong> → <strong>${memberData[0].total>memberData[1].total?memberData[0].name:memberData[1].name}</strong> に <strong>${fmt(diff)}</strong></div>
-          ${settled>0?`<div class="tiny" style="margin-top:4px">精算済み: ${fmt(settled)} ／ 残り: <strong style="color:${remaining>0?'#EF4444':'#1D9E75'}">${fmt(Math.max(remaining,0))}</strong></div>`:''}
+          ${settled>0?`<div class="tiny" style="margin-top:4px">精算済み: ${fmt(settled)} ／ 残り: <strong style="color:${remaining>0?'#EF4444':'#1D9E75'}">${fmt(remaining)}</strong></div>`:''}
         </div>
-        <button class="btn-primary" onclick="openSettlementModal()">記録</button>
+        <button class="btn-primary" onclick="openSettlementModal(null)">記録</button>
       </div>
     </div>`:''}
-
     ${(t.settlements||[]).length?`
     <div class="section-title" style="margin:8px 0">精算履歴</div>
     ${[...(t.settlements||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(s=>`
@@ -852,28 +884,35 @@ function renderBudget(t){
             </div>
             ${s.note?`<div class="note-box" style="margin-top:6px">📝 ${s.note}</div>`:''}
           </div>
-          <button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteSettlement(${s.id})">削除</button>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <button class="btn-edit" style="font-size:10px;padding:2px 7px" onclick='openSettlementModal(${escJ(s)})'>編集</button>
+            <button class="btn-danger" style="font-size:10px;padding:2px 7px" onclick="deleteSettlement(${s.id})">削除</button>
+          </div>
         </div>
       </div>`).join('')}`:''}`;
 }
 
-window.openSettlementModal=function(){
-  document.getElementById('sl-id').value='';
-  document.getElementById('sl-date').value='';
-  document.getElementById('sl-amount').value='';
-  document.getElementById('sl-note').value='';
-  document.getElementById('sl-from').value='ケンケン';
-  document.getElementById('sl-to').value='あき';
-  document.getElementById('sl-from-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m==='ケンケン'?' active':''}" onclick="selectChip('sl-from','${m}',this)">${m}</button>`).join('');
-  document.getElementById('sl-to-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m==='あき'?' active':''}" onclick="selectChip('sl-to','${m}',this)">${m}</button>`).join('');
+window.openSettlementModal=function(s){
+  document.getElementById('settlementModalTitle').textContent=s?'精算を編集':'精算を記録';
+  document.getElementById('sl-id').value=s?s.id:'';
+  document.getElementById('sl-date').value=s?s.date||'':'';
+  document.getElementById('sl-amount').value=s?s.amount||'':'';
+  document.getElementById('sl-note').value=s?s.note||'':'';
+  const fromVal=s?s.from||'ケンケン':'ケンケン';
+  const toVal=s?s.to||'あき':'あき';
+  document.getElementById('sl-from').value=fromVal;
+  document.getElementById('sl-to').value=toVal;
+  document.getElementById('sl-from-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m===fromVal?' active':''}" onclick="selectChip('sl-from','${m}',this)">${m}</button>`).join('');
+  document.getElementById('sl-to-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m===toVal?' active':''}" onclick="selectChip('sl-to','${m}',this)">${m}</button>`).join('');
   showModal('settlementModal');
 };
 window.saveSettlement=function(){
   const amount=document.getElementById('sl-amount').value;
   if(!amount){alert('金額を入力してください');return;}
-  const s={id:Date.now(),date:document.getElementById('sl-date').value,amount:parseInt(amount)||0,from:document.getElementById('sl-from').value,to:document.getElementById('sl-to').value,note:document.getElementById('sl-note').value};
-  updateTrip({settlements:[...(window.activeTrip.settlements||[]),s]});
-  hideModal('settlementModal');
+  const id=document.getElementById('sl-id').value;
+  const s={id:id?parseInt(id):Date.now(),date:document.getElementById('sl-date').value,amount:parseInt(amount)||0,from:document.getElementById('sl-from').value,to:document.getElementById('sl-to').value,note:document.getElementById('sl-note').value};
+  const settlements=id?(window.activeTrip.settlements||[]).map(x=>x.id==id?s:x):[...(window.activeTrip.settlements||[]),s];
+  updateTrip({settlements});hideModal('settlementModal');
 };
 window.deleteSettlement=function(id){if(!confirm('削除しますか？'))return;updateTrip({settlements:(window.activeTrip.settlements||[]).filter(s=>s.id!==id)});};
 
@@ -911,15 +950,12 @@ window.openBudgetDetail=function(cat){
   showModal('budgetDetailModal');
 };
 window.saveBudgetDetail=function(cat){
-  const budgetJPY=parseInt(document.getElementById('bd-budget').value)||0;
-  const note=document.getElementById('bd-note').value;
-  updateTrip({budgets:(window.activeTrip.budgets||[]).map(b=>b.cat===cat?{...b,budgetJPY,note}:b)});
+  updateTrip({budgets:(window.activeTrip.budgets||[]).map(b=>b.cat===cat?{...b,budgetJPY:parseInt(document.getElementById('bd-budget').value)||0,note:document.getElementById('bd-note').value}:b)});
   openBudgetDetail(cat);
 };
 window.openExpModal=function(cat){
   ['ae-desc','ae-amount','ae-date'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('ae-cat').value=cat;
-  document.getElementById('ae-paidBy').value='ケンケン';
+  document.getElementById('ae-cat').value=cat;document.getElementById('ae-paidBy').value='ケンケン';
   document.getElementById('ae-member-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m==='ケンケン'?' active':''}" onclick="selectChip('ae-paidBy','${m}',this)">${m}</button>`).join('');
   document.getElementById('addExpTitle').textContent=CAT_ICON[cat]+' '+cat+' — 支出を追加';
   showModal('addExpModal');
@@ -932,12 +968,9 @@ window.saveExpense=function(){
   hideModal('addExpModal');openBudgetDetail(cat);
 };
 window.openEditExpModal=function(e){
-  document.getElementById('ee-id').value=e.id;
-  document.getElementById('ee-cat').value=e.cat;
-  document.getElementById('ee-desc').value=e.desc||'';
-  document.getElementById('ee-amount').value=e.amountJPY||'';
-  document.getElementById('ee-date').value=e.date||'';
-  document.getElementById('ee-paidBy').value=e.paidBy||'ケンケン';
+  document.getElementById('ee-id').value=e.id;document.getElementById('ee-cat').value=e.cat;
+  document.getElementById('ee-desc').value=e.desc||'';document.getElementById('ee-amount').value=e.amountJPY||'';
+  document.getElementById('ee-date').value=e.date||'';document.getElementById('ee-paidBy').value=e.paidBy||'ケンケン';
   document.getElementById('editExpTitle').textContent=CAT_ICON[e.cat]+' '+e.cat+' — 支出を編集';
   document.getElementById('ee-member-chips').innerHTML=MEMBERS.map(m=>`<button class="chip${m===(e.paidBy||'ケンケン')?' active':''}" onclick="selectChip('ee-paidBy','${m}',this)">${m}</button>`).join('');
   showModal('editExpModal');
@@ -946,23 +979,16 @@ window.updateExpense=function(){
   const id=parseInt(document.getElementById('ee-id').value);
   const cat=document.getElementById('ee-cat').value;
   const desc=document.getElementById('ee-desc').value.trim();if(!desc)return;
-  const updated={id,cat,desc,amountJPY:parseFloat(document.getElementById('ee-amount').value)||0,paidBy:document.getElementById('ee-paidBy').value,date:document.getElementById('ee-date').value};
-  updateTrip({expenses:(window.activeTrip.expenses||[]).map(e=>e.id===id?updated:e)});
+  const u={id,cat,desc,amountJPY:parseFloat(document.getElementById('ee-amount').value)||0,paidBy:document.getElementById('ee-paidBy').value,date:document.getElementById('ee-date').value};
+  updateTrip({expenses:(window.activeTrip.expenses||[]).map(e=>e.id===id?u:e)});
   hideModal('editExpModal');openBudgetDetail(cat);
 };
-window.deleteExp=function(id,cat){
-  updateTrip({expenses:(window.activeTrip.expenses||[]).filter(e=>e.id!==id)});
-  openBudgetDetail(cat);
-};
+window.deleteExp=function(id,cat){updateTrip({expenses:(window.activeTrip.expenses||[]).filter(e=>e.id!==id)});openBudgetDetail(cat);};
 
 // ── SCHEDULE ──
 function renderSchedule(t){
-  const days=t.days||[];
-  const day=days[window.activeDay]||{};
-  // 開始時刻順にソート（時刻なしは末尾）
-  const events=(t.schedule||[])
-    .filter(e=>e.day===window.activeDay)
-    .sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+  const days=t.days||[];const day=days[window.activeDay]||{};
+  const events=(t.schedule||[]).filter(e=>e.day===window.activeDay).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
   return `
     <h1 class="page-title">スケジュール</h1>
     <div class="chip-row" style="margin:12px 0">
@@ -1003,7 +1029,6 @@ function renderSchedule(t){
     </div>`;
 }
 window.selectDay=function(i){window.activeDay=i;renderTab('schedule');};
-
 function populateScheduleModal(){
   const t=window.activeTrip;
   document.getElementById('as-day').innerHTML=(t.days||[]).map((d,i)=>`<option value="${i}" ${i===window.activeDay?'selected':''}>${d.date} ${d.label}</option>`).join('');
@@ -1022,14 +1047,10 @@ window.openScheduleModal=function(){
 window.editScheduleItem=function(ev){
   document.getElementById('scheduleModalTitle').textContent='予定を編集';
   document.getElementById('as-id').value=ev.id;
-  document.getElementById('as-time').value=ev.time||'';
-  document.getElementById('as-endtime').value=ev.endtime||'';
-  document.getElementById('as-title').value=ev.title||'';
-  document.getElementById('as-memo').value=ev.memo||'';
-  document.getElementById('as-cat').value=ev.cat||'観光';
-  document.getElementById('as-member').value=ev.member||'両方';
-  populateScheduleModal();
-  document.getElementById('as-day').value=ev.day;
+  document.getElementById('as-time').value=ev.time||'';document.getElementById('as-endtime').value=ev.endtime||'';
+  document.getElementById('as-title').value=ev.title||'';document.getElementById('as-memo').value=ev.memo||'';
+  document.getElementById('as-cat').value=ev.cat||'観光';document.getElementById('as-member').value=ev.member||'両方';
+  populateScheduleModal();document.getElementById('as-day').value=ev.day;
   showModal('editScheduleModal');
 };
 window.saveSchedule=function(){
@@ -1038,8 +1059,7 @@ window.saveSchedule=function(){
   const dayIdx=parseInt(document.getElementById('as-day').value);
   const ev={id:id?parseInt(id):Date.now(),day:dayIdx,time:document.getElementById('as-time').value,endtime:document.getElementById('as-endtime').value,cat:document.getElementById('as-cat').value,title,memo:document.getElementById('as-memo').value,member:document.getElementById('as-member').value};
   const schedule=id?(window.activeTrip.schedule||[]).map(e=>e.id==id?ev:e):[...(window.activeTrip.schedule||[]),ev];
-  window.activeDay=dayIdx;
-  updateTrip({schedule});hideModal('editScheduleModal');
+  window.activeDay=dayIdx;updateTrip({schedule});hideModal('editScheduleModal');
 };
 window.deleteSchedule=function(id){updateTrip({schedule:(window.activeTrip.schedule||[]).filter(e=>e.id!==id)});};
 
@@ -1048,11 +1068,7 @@ function renderChecklist(t){
   const allCats=getCheckCats();
   const items=t.checklist||[];
   const f=window.checkFilter;
-  let filtered;
-  if(f==='すべて')filtered=items;
-  else if(f==='未完了')filtered=items.filter(i=>!i.checked);
-  else if(f==='完了')filtered=items.filter(i=>i.checked);
-  else filtered=items.filter(i=>i.cat===f);
+  let filtered=f==='すべて'?items:f==='未完了'?items.filter(i=>!i.checked):f==='完了'?items.filter(i=>i.checked):items.filter(i=>i.cat===f);
   const checked=items.filter(i=>i.checked).length;
   const pct=items.length?Math.round((checked/items.length)*100):0;
   const activeCats=allCats.filter(cat=>filtered.some(i=>i.cat===cat));
@@ -1097,10 +1113,8 @@ window.openCheckModal=function(){
 };
 window.editCheckItem=function(item){
   document.getElementById('checkModalTitle').textContent='持ち物を編集';
-  document.getElementById('ack-id').value=item.id;
-  document.getElementById('ack-name').value=item.name||'';
-  document.getElementById('ack-cat').value=item.cat||'書類';
-  document.getElementById('ack-member').value=item.member||'両方';
+  document.getElementById('ack-id').value=item.id;document.getElementById('ack-name').value=item.name||'';
+  document.getElementById('ack-cat').value=item.cat||'書類';document.getElementById('ack-member').value=item.member||'両方';
   renderCheckCatChips(item.cat||'書類');
   document.getElementById('ack-member-chips').innerHTML=[...MEMBERS,'両方'].map(m=>`<button class="chip${m===(item.member||'両方')?' active':''}" onclick="selectChip('ack-member','${m}',this)">${m}</button>`).join('');
   showModal('editCheckModal');
@@ -1112,8 +1126,7 @@ window.addCustomCheckCat=function(){
   const val=document.getElementById('ack-new-cat').value.trim();if(!val)return;
   const custom=[...(window.activeTrip.customCheckCats||[])];
   if(!custom.includes(val)&&!CHECK_CATS.includes(val)){custom.push(val);updateTrip({customCheckCats:custom});}
-  document.getElementById('ack-new-cat').value='';
-  renderCheckCatChips(val);document.getElementById('ack-cat').value=val;
+  document.getElementById('ack-new-cat').value='';renderCheckCatChips(val);document.getElementById('ack-cat').value=val;
 };
 window.saveCheckItem=function(){
   const id=document.getElementById('ack-id').value;
