@@ -443,8 +443,8 @@ function renderTripList(){
         </div>
         <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
           ${showing
-            ?`<button class="btn-edit" style="font-size:11px;padding:3px 8px" onclick="unarchiveTrip('${t.id}')">戻す</button>`
-            :`<button class="btn-archive" onclick="archiveTrip('${t.id}')">過去の旅行</button>`
+            ?`<button class="btn-edit" style="font-size:11px;padding:3px 8px" onclick="unarchiveTrip('${t.id}')">← 戻す</button>`
+            :`<button class="btn-archive" onclick="archiveTrip('${t.id}')">→ 過去の旅行へ</button>`
           }
           <button onclick="deleteTripById('${t.id}')" style="background:none;border:none;font-size:16px;color:#9CA3AF;cursor:pointer;padding:2px">✕</button>
         </div>
@@ -564,11 +564,14 @@ function renderHome(t){
     </div>`;
 }
 
+// ── BACK BTN ──
+function backBtn(){return `<button onclick="switchTab('home')" style="display:inline-flex;align-items:center;gap:4px;background:#F3F4F6;border:none;border-radius:8px;padding:6px 12px;font-size:13px;color:#374151;cursor:pointer;margin-bottom:14px;">← メニューに戻る</button>`;}
+
 // ── BOOKING ──
 function renderBooking(t){
   const hideFlight=t.hideFlights;
   const hideIns=t.hideInsurance;
-  return `
+  return `${backBtn()}
     <h1 class="page-title">予約情報</h1>
 
     <!-- 航空券セクション -->
@@ -689,7 +692,7 @@ window.deleteHotel=function(id){if(!confirm('削除しますか？'))return;upda
 function renderInsurance(t){
   const hide=t.hideInsurance;
   const ins=t.insurance||[];
-  return `
+  return `${backBtn()}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:8px">
         <h1 class="page-title" style="margin-bottom:0">🛡️ 保険</h1>
@@ -759,7 +762,7 @@ function renderPlaces(t){
   const shown=f==='すべて'?all:f==='絶対行く'?must:nice;
   const mustShown=f==='すべて'||f==='絶対行く'?must:[];
   const niceShown=f==='すべて'||f==='できれば'?nice:[];
-  return `
+  return `${backBtn()}
     <div class="row"><div><h1 class="page-title">行きたい場所</h1><div class="sub">${all.length}件</div></div><button class="btn-primary" onclick="openPlaceModal()">＋ 追加</button></div>
     <div class="chip-row">${['すべて','絶対行く','できれば'].map(p=>`<button class="chip${f===p?' active':''}" onclick="setPlacesFilter('${p}')">${p}</button>`).join('')}</div>
     ${[['絶対行く','#FAEEDA','#854F0B',mustShown],['できれば','#F1EFE8','#5F5E5A',niceShown]].map(([title,bg,color,items])=>items.length?`
@@ -829,7 +832,7 @@ function renderBudget(t){
   const memberData=(t.members||[]).map(m=>({name:m,total:(t.expenses||[]).filter(e=>e.paidBy===m).reduce((a,e)=>a+e.amountJPY,0)}));
   const diff=memberData.length>=2?Math.abs(memberData[0].total-memberData[1].total)/2:0;
   const remaining=Math.max(diff-settled,0);
-  return `
+  return `${backBtn()}
     <h1 class="page-title">予算・支出管理</h1>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0">
       ${[['総予算',fmt(totalB)],['総支出',fmt(totalS)],['残り',fmt(totalB-totalS)]].map(([l,v])=>`<div style="background:#F9FAFB;border-radius:10px;padding:10px"><div class="tiny">${l}</div><strong style="font-size:14px">${v}</strong></div>`).join('')}
@@ -989,7 +992,7 @@ window.deleteExp=function(id,cat){updateTrip({expenses:(window.activeTrip.expens
 function renderSchedule(t){
   const days=t.days||[];const day=days[window.activeDay]||{};
   const events=(t.schedule||[]).filter(e=>e.day===window.activeDay).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
-  return `
+  return `${backBtn()}
     <h1 class="page-title">スケジュール</h1>
     <div class="chip-row" style="margin:12px 0">
       ${days.map((d,i)=>`<button class="chip${i===window.activeDay?' active':''}" onclick="selectDay(${i})" style="flex-direction:column;height:auto;padding:6px 10px;min-width:65px;text-align:center">
@@ -1072,7 +1075,7 @@ function renderChecklist(t){
   const checked=items.filter(i=>i.checked).length;
   const pct=items.length?Math.round((checked/items.length)*100):0;
   const activeCats=allCats.filter(cat=>filtered.some(i=>i.cat===cat));
-  return `
+  return `${backBtn()}
     <div class="row"><div><h1 class="page-title">持ち物リスト</h1><div class="sub">${checked}/${items.length} 完了</div></div><button class="btn-primary" onclick="openCheckModal()">＋ 追加</button></div>
     <div class="card" style="margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span class="tiny">準備完了 ${pct}%</span><span class="tiny">${checked}/${items.length}個</span></div>
