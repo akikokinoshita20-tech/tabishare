@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -22,6 +23,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nav-btn small{font-size:10.5px;color:#6B7280;font-weight:600;}
 .nav-btn.active small{color:#2563EB;font-weight:700;}
 .card{background:#fff;border-radius:14px;padding:16px;border:1px solid #E5E7EB;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,0.03);}
+.card.drag-target{border-color:#2563EB;box-shadow:0 0 0 2px rgba(37,99,235,0.25);}
+.drag-handle{cursor:grab;touch-action:none;color:#9CA3AF;font-size:18px;padding:2px 6px;user-select:none;}
+.card.dragging{opacity:0.6;box-shadow:0 6px 16px rgba(0,0,0,0.15);}
 .btn-primary{background:#2563EB;border-radius:10px;padding:10px 16px;border:none;color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;white-space:nowrap;}
 .btn-sec{background:#fff;border-radius:10px;padding:10px 16px;border:1.5px solid #9CA3AF;color:#374151;font-size:14.5px;font-weight:600;cursor:pointer;}
 .btn-danger{background:#DC2626;border-radius:10px;padding:10px 16px;border:none;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
@@ -569,6 +573,51 @@ function renderHome(t){
 // ── BACK BTN ──
 function backBtn(){return `<button onclick="switchTab('home')" style="display:inline-flex;align-items:center;gap:4px;background:#F3F4F6;border:none;border-radius:8px;padding:6px 12px;font-size:13px;color:#374151;cursor:pointer;margin-bottom:14px;">← メニューに戻る</button>`;}
 
+// ── DRAG REORDER ──
+window.dragCtx=null;
+window.startDrag=function(e,type,idx){
+  e.preventDefault();
+  const card=e.target.closest('.card');
+  if(!card)return;
+  window.dragCtx={type,fromIdx:idx,card,startY:e.clientY};
+  card.classList.add('dragging');
+  card.style.zIndex=50;
+  document.addEventListener('pointermove',window.onDragMove);
+  document.addEventListener('pointerup',window.onDragEnd);
+};
+window.onDragMove=function(e){
+  if(!window.dragCtx)return;
+  const dy=e.clientY-window.dragCtx.startY;
+  window.dragCtx.card.style.transform=`translateY(${dy}px)`;
+  document.querySelectorAll(`.card[data-type="${window.dragCtx.type}"]`).forEach(c=>c.classList.remove('drag-target'));
+  window.dragCtx.card.style.pointerEvents='none';
+  const under=document.elementFromPoint(e.clientX,e.clientY);
+  window.dragCtx.card.style.pointerEvents='';
+  const targetCard=under&&under.closest(`.card[data-type="${window.dragCtx.type}"]`);
+  if(targetCard&&targetCard!==window.dragCtx.card)targetCard.classList.add('drag-target');
+};
+window.onDragEnd=function(e){
+  if(!window.dragCtx)return;
+  const {type,fromIdx,card}=window.dragCtx;
+  document.removeEventListener('pointermove',window.onDragMove);
+  document.removeEventListener('pointerup',window.onDragEnd);
+  card.classList.remove('dragging');
+  card.style.transform='';card.style.zIndex='';
+  document.querySelectorAll(`.card[data-type="${type}"]`).forEach(c=>c.classList.remove('drag-target'));
+  card.style.pointerEvents='none';
+  const under=document.elementFromPoint(e.clientX,e.clientY);
+  card.style.pointerEvents='';
+  window.dragCtx=null;
+  const targetCard=under&&under.closest(`.card[data-type="${type}"]`);
+  if(!targetCard||targetCard===card)return;
+  const toIdx=parseInt(targetCard.dataset.idx);
+  if(isNaN(toIdx)||toIdx===fromIdx)return;
+  const list=[...(window.activeTrip[type]||[])];
+  const [moved]=list.splice(fromIdx,1);
+  list.splice(toIdx,0,moved);
+  updateTrip({[type]:list});
+};
+
 // ── BOOKING ──
 function renderBooking(t){
   const hideFlight=t.hideFlights;
@@ -588,10 +637,10 @@ function renderBooking(t){
     </div>
     ${hideFlight
       ?`<div class="card" style="background:#FEF9F9;border-color:#FECACA;margin-bottom:16px"><div class="tiny" style="color:#EF4444;text-align:center">航空券は非表示設定中です</div></div>`
-      :(t.flights||[]).length?(t.flights||[]).map(b=>`
-        <div class="card">
+      :(t.flights||[]).length?(t.flights||[]).map((b,i)=>`
+        <div class="card" data-type="flights" data-idx="${i}">
           <div class="row">
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">✈️ <strong>${b.airline} ${b.flightNo}</strong>${badge(b.cls||'','#EEEDFE','#3C3489')}</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span class="drag-handle" onpointerdown="startDrag(event,'flights',${i})">⠿</span>✈️ <strong>${b.airline} ${b.flightNo}</strong>${badge(b.cls||'','#EEEDFE','#3C3489')}</div>
             <div style="display:flex;gap:6px">
               <button class="btn-edit" onclick='editFlight(${escJ(b)})'>編集</button>
               <button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteFlight(${b.id})">削除</button>
@@ -611,10 +660,10 @@ function renderBooking(t){
       <div class="section-title" style="margin-bottom:0">🏨 宿泊</div>
       <button class="btn-primary" onclick="openHotelModal()">＋ 追加</button>
     </div>
-    ${(t.hotels||[]).length?(t.hotels||[]).map(b=>`
-      <div class="card">
+    ${(t.hotels||[]).length?(t.hotels||[]).map((b,i)=>`
+      <div class="card" data-type="hotels" data-idx="${i}">
         <div class="row">
-          <div style="display:flex;align-items:center;gap:6px">🏨 <strong>${b.name}</strong></div>
+          <div style="display:flex;align-items:center;gap:6px"><span class="drag-handle" onpointerdown="startDrag(event,'hotels',${i})">⠿</span>🏨 <strong>${b.name}</strong></div>
           <div style="display:flex;gap:6px">
             <button class="btn-edit" onclick='editHotel(${escJ(b)})'>編集</button>
             <button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteHotel(${b.id})">削除</button>
