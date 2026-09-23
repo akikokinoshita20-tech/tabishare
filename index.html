@@ -545,13 +545,16 @@ function renderHome(t){
   const total=(t.checklist||[]).length;
   const nights=totalNights(t);
   return `
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-      <div class="cover-box" style="width:56px;height:56px;font-size:28px">${t.cover}</div>
-      <div>
-        <div style="font-size:20px;font-weight:700">${t.name}</div>
-        <div class="sub">${t.startDate} 〜 ${t.endDate}</div>
-        <span class="badge" style="background:${st.bg};color:${st.color};margin-top:4px;display:inline-block">${st.label}</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="cover-box" style="width:56px;height:56px;font-size:28px">${t.cover}</div>
+        <div>
+          <div style="font-size:20px;font-weight:700">${t.name}</div>
+          <div class="sub">${t.startDate} 〜 ${t.endDate}</div>
+          <span class="badge" style="background:${st.bg};color:${st.color};margin-top:4px;display:inline-block">${st.label}</span>
+        </div>
       </div>
+      <button class="btn-sec" onclick="printTrip()" style="white-space:nowrap;padding:8px 12px;font-size:12.5px">🖨️ 印刷</button>
     </div>
     <div class="card" style="margin-bottom:16px">
       <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
@@ -569,6 +572,86 @@ function renderHome(t){
       <div class="menu-card" onclick="switchTab('checklist')"><div class="menu-icon" style="background:#E1F5EE">✅</div><strong style="font-size:13px">持ち物リスト</strong><span style="font-size:11px;color:#085041">${checked}/${total} 完了</span></div>
     </div>`;
 }
+
+// ── PRINT / PDF ──
+window.printTrip=function(){
+  const t=window.activeTrip;if(!t)return;
+  const esc=s=>(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const nights=totalNights(t);
+  const flightsHtml=(t.flights||[]).length?`
+    <table class="p-table">
+      <thead><tr><th>航空会社/便名</th><th>区間</th><th>出発</th><th>到着</th><th>クラス</th><th>確認番号</th></tr></thead>
+      <tbody>${(t.flights||[]).map(b=>`<tr><td>${esc(b.airline)} ${esc(b.flightNo)}</td><td>${esc(b.from)} → ${esc(b.to)}</td><td>${esc(b.departure)}</td><td>${esc(b.arrival)}</td><td>${esc(b.cls)}</td><td>${esc(b.confirmNo)}</td></tr>${b.note?`<tr><td colspan="6" class="p-note">📝 ${esc(b.note)}</td></tr>`:''}`).join('')}</tbody>
+    </table>`:'<div class="p-empty">航空券情報なし</div>';
+  const hotelsHtml=(t.hotels||[]).length?`
+    <table class="p-table">
+      <thead><tr><th>ホテル名</th><th>チェックイン</th><th>チェックアウト</th><th>泊数</th><th>確認番号</th></tr></thead>
+      <tbody>${(t.hotels||[]).map(b=>`<tr><td>${esc(b.name)}</td><td>${esc(b.checkIn)}</td><td>${esc(b.checkOut)}</td><td>${esc(b.nights)}泊</td><td>${esc(b.confirmNo)}</td></tr>${b.note?`<tr><td colspan="5" class="p-note">📋 ${esc(b.note)}</td></tr>`:''}${b.free?`<tr><td colspan="5" class="p-note">📝 ${esc(b.free)}</td></tr>`:''}`).join('')}</tbody>
+    </table>`:'<div class="p-empty">宿泊情報なし</div>';
+  const insHtml=(t.insurance||[]).length?`
+    <table class="p-table">
+      <thead><tr><th>保険名</th><th>種別</th><th>保険料</th><th>支払日</th><th>証券番号</th></tr></thead>
+      <tbody>${(t.insurance||[]).map(i=>`<tr><td>${esc(i.name)}</td><td>${esc(i.type)}</td><td>${i.amount?fmt(parseInt(i.amount)):''}</td><td>${esc(i.date)}</td><td>${esc(i.no)}</td></tr>${i.note?`<tr><td colspan="5" class="p-note">📝 ${esc(i.note)}</td></tr>`:''}`).join('')}</tbody>
+    </table>`:'<div class="p-empty">保険情報なし</div>';
+  const days=t.days||[];
+  const scheduleHtml=days.length?days.map((d,i)=>{
+    const evs=(t.schedule||[]).filter(e=>e.day===i).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+    return `<div class="p-day">
+      <div class="p-day-title">${esc(d.date)}　${esc(d.label||'')}</div>
+      ${evs.length?`<table class="p-table"><thead><tr><th style="width:70px">時間</th><th>予定</th><th style="width:70px">担当</th></tr></thead><tbody>
+        ${evs.map(ev=>`<tr><td>${esc(ev.time)||'－'}${ev.endtime?'〜'+esc(ev.endtime):''}</td><td>${CAT_ICON[ev.cat]||''} <strong>${esc(ev.title)}</strong>${ev.memo?`<div class="p-note">${esc(ev.memo)}</div>`:''}</td><td>${esc(ev.member)}</td></tr>`).join('')}
+      </tbody></table>`:'<div class="p-empty">予定なし</div>'}
+    </div>`;
+  }).join(''):'<div class="p-empty">旅程未設定</div>';
+  const checklistHtml=(t.checklist||[]).length?(()=>{
+    const cats=[...new Set((t.checklist||[]).map(c=>c.cat))];
+    return cats.map(cat=>`
+      <div class="p-check-cat">${getCheckCatIcon(cat)} ${esc(cat)}</div>
+      <div class="p-check-list">${(t.checklist||[]).filter(c=>c.cat===cat).map(c=>`<div class="p-check-item"><span class="p-box">${c.checked?'☑':'☐'}</span>${esc(c.name)}（${esc(c.member)}）</div>`).join('')}</div>`).join('');
+  })():'<div class="p-empty">持ち物リストなし</div>';
+
+  const html=`<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>${esc(t.name)} — 旅行しおり</title>
+  <style>
+    @page{size:A4;margin:16mm 14mm;}
+    *{box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;color:#111;font-size:12px;line-height:1.5;margin:0;padding:16px;}
+    h1{font-size:20px;margin:0 0 4px;}
+    .p-sub{color:#555;font-size:12px;margin-bottom:2px;}
+    .p-header{border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:16px;}
+    .p-section{margin-bottom:20px;page-break-inside:avoid;}
+    .p-section-title{font-size:14px;font-weight:700;border-left:4px solid #2563EB;padding-left:8px;margin-bottom:8px;}
+    .p-table{width:100%;border-collapse:collapse;font-size:11.5px;}
+    .p-table th,.p-table td{border:1px solid #D1D5DB;padding:5px 7px;text-align:left;vertical-align:top;}
+    .p-table th{background:#F3F4F6;}
+    .p-note{font-size:11px;color:#555;background:#FAFAFA;}
+    .p-empty{color:#9CA3AF;font-size:12px;}
+    .p-day{margin-bottom:12px;page-break-inside:avoid;}
+    .p-day-title{font-weight:700;background:#EEF2FF;padding:4px 8px;border-radius:4px;margin-bottom:4px;font-size:12.5px;}
+    .p-check-cat{font-weight:700;margin:8px 0 4px;font-size:12.5px;}
+    .p-check-list{display:flex;flex-wrap:wrap;gap:4px 16px;margin-bottom:4px;}
+    .p-check-item{width:auto;font-size:11.5px;}
+    .p-box{margin-right:4px;}
+    .p-noprint button{padding:9px 18px;font-size:13.5px;font-weight:700;color:#fff;background:#2563EB;border:none;border-radius:8px;cursor:pointer;}
+    @media print{ .p-noprint{display:none;} body{padding:0;} }
+  </style></head>
+  <body>
+    <div class="p-noprint" style="text-align:right;margin-bottom:14px"><button onclick="window.print()">🖨️ 印刷 / PDFとして保存</button></div>
+    <div class="p-header">
+      <h1>${esc(t.cover)} ${esc(t.name)}</h1>
+      <div class="p-sub">${esc(t.startDate)} 〜 ${esc(t.endDate)}　（${nights}泊）</div>
+      <div class="p-sub">メンバー：${(t.members||[]).join('、')}</div>
+    </div>
+    <div class="p-section"><div class="p-section-title">✈️ 航空券</div>${t.hideFlights?'<div class="p-empty">非表示設定中</div>':flightsHtml}</div>
+    <div class="p-section"><div class="p-section-title">🏨 宿泊</div>${hotelsHtml}</div>
+    <div class="p-section"><div class="p-section-title">🛡️ 保険</div>${t.hideInsurance?'<div class="p-empty">非表示設定中</div>':insHtml}</div>
+    <div class="p-section"><div class="p-section-title">📅 旅程</div>${scheduleHtml}</div>
+    <div class="p-section"><div class="p-section-title">✅ 持ち物リスト</div>${checklistHtml}</div>
+    <div class="p-sub" style="margin-top:24px;color:#9CA3AF">出力日時：${new Date().toLocaleString('ja-JP')}</div>
+  </body></html>`;
+  const w=window.open('','_blank');
+  if(!w){alert('ポップアップがブロックされました。ブラウザの設定でこのサイトのポップアップを許可してください。');return;}
+  w.document.open();w.document.write(html);w.document.close();
+};
 
 // ── BACK BTN ──
 function backBtn(){return `<button onclick="switchTab('home')" style="display:inline-flex;align-items:center;gap:4px;background:#F3F4F6;border:none;border-radius:8px;padding:6px 12px;font-size:13px;color:#374151;cursor:pointer;margin-bottom:14px;">← メニューに戻る</button>`;}
